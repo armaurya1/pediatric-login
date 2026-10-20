@@ -77,11 +77,11 @@ const TABS = [
 
 type TabKey = (typeof TABS)[number]['key'];
 
-export default function HomeScreen({
-  onVideoConsult,
-}: {
-  onVideoConsult: () => void;
-}) {
+type Props = {
+  onOnlineConsult: () => void;
+};
+
+export default function HomeScreen({ onOnlineConsult }: Props) {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<TabKey>('home');
   const [fontsLoaded] = useFonts({
@@ -165,407 +165,299 @@ export default function HomeScreen({
               />
               <Image
                 source={require('./assets/images/home/doctor-face.png')}
-                style={styles.doctorFace}
-                resizeMode="cover"
+                style={styles.doctos­ûæÚ$z{-®éÜj×,
+    image: require('./assets/images/consult/urology.png'),
+  },
+  { label: 'ENT', image: require('./assets/images/consult/ent.png') },
+  {
+    label: 'Cardiology',
+    image: require('./assets/images/consult/cardiology.png'),
+  },
+  {
+    label: 'Paediatrics',
+    image: require('./assets/images/consult/paediatrics.png'),
+  },
+  {
+    label: 'Digestive\nHealth',
+    image: require('./assets/images/consult/digestive-health.png'),
+  },
+  {
+    label: 'Neurology',
+    image: require('./assets/images/consult/neurology.png'),
+  },
+  {
+    label: 'Orthopaedics',
+    image: require('./assets/images/consult/orthopaedics.png'),
+  },
+  {
+    label: 'Thyroid\nCare',
+    image: require('./assets/images/consult/thyroid-care.png'),
+  },
+  {
+    label: 'Diabetology',
+    image: require('./assets/images/consult/diabetology.png'),
+  },
+];
+
+export default function ConsultScreen({ onBack }: Props) {
+  const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const [fontsLoaded] = useFonts({
+    Roboto_400Regular,
+    Roboto_700Bold,
+  });
+  const safeOffset = Math.max(0, insets.top - 44);
+  const columnWidth = (width - 28 - 39) / 4;
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
+  return (
+    <View style={styles.root}>
+      <StatusBar style="dark" />
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingBottom: Math.max(12, insets.bottom) }}
+      >
+        <View style={[styles.header, { height: 169 + safeOffset }]}>
+          <View style={[styles.topRow, { top: 53 + safeOffset }]}>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Back to home"
+              hitSlop={8}
+              onPress={onBack}
+              style={styles.backButton}
+            >
+              <Image
+                source={require('./assets/images/consult/back.png')}
+                style={styles.backIcon}
+                resizeMode="contain"
               />
-            </LinearGradient>
-            <Pressable style={styles.consultCardPress} onPress={onVideoConsult}>
-              <LinearGradient
-                colors={['#e8dff9', '#cba5f8']}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 0 }}
-                style={styles.consultCardFill}
-              >
-                <Text style={styles.consultTitle}>
-                  Video{'\n'}Consultation
-                </Text>
-                <Image
-                  source={require('./assets/images/home/video-call.png')}
-                  style={styles.videoCall}
-                  resizeMode="cover"
-                />
-              </LinearGradient>
             </Pressable>
+            <Text style={styles.headerTitle}>ONLINE CONSULT</Text>
           </View>
 
-          <View style={styles.shortcutRow}>
-            {SHORTCUTS.map((item) => (
-              <View key={item.label} style={styles.shortcut}>
-                <Image
-                  source={item.image}
-                  style={styles.shortcutIcon}
-                  resizeMode="cover"
-                />
-                <Text style={styles.shortcutLabel}>{item.label}</Text>
+          <View style={[styles.locationGroup, { top: 53 + safeOffset }]}>
+            <Text style={styles.locationCaption}>Your Location:</Text>
+            <Image
+              source={require('./assets/images/consult/location-pin.png')}
+              style={styles.locationPin}
+              resizeMode="contain"
+            />
+            <Text style={styles.locationValue}>Barabanki 225003</Text>
+            <Image
+              source={require('./assets/images/consult/location-change.png')}
+              style={styles.locationChange}
+              resizeMode="contain"
+            />
+          </View>
+
+          <View style={[styles.searchBox, { top: 111 + safeOffset }]}>
+            <Image
+              source={require('./assets/images/consult/search.png')}
+              style={styles.searchIcon}
+              resizeMode="contain"
+            />
+            <TextInput
+              accessibilityLabel="Search doctors, specialties, or symptoms"
+              style={styles.searchInput}
+              placeholder="Search Doctors, specialties, symptoms..."
+              placeholderTextColor="#7e8184"
+              returnKeyType="search"
+            />
+          </View>
+        </View>
+
+        <View style={styles.body}>
+          <Text style={styles.sectionTitle}>Speciality</Text>
+
+          <View style={styles.specialtyGrid}>
+            {SPECIALTIES.map((specialty) => (
+              <View
+                key={specialty.label}
+                style={[styles.specialtyItem, { width: columnWidth }]}
+              >
+                <View style={styles.iconShadow}>
+                  <View style={styles.iconCard}>
+                    <Image
+                      source={specialty.image}
+                      style={styles.specialtyImage}
+                      resizeMode="contain"
+                    />
+                  </View>
+                </View>
+                <Text style={styles.specialtyName}>{specialty.label}</Text>
               </View>
             ))}
           </View>
-        </View>
 
-        {/* Recently viewed and care assistant (Figma 34:582) */}
-        <View style={styles.recentSection}>
-          <Text style={styles.sectionHeading}>Recently Viewed</Text>
-
-          <View style={styles.recentCard}>
-            <Image
-              source={require('./assets/images/home/physician.png')}
-              style={styles.physicianIcon}
-              resizeMode="cover"
-            />
-            <Text style={styles.recentSpecialty}>General physician</Text>
-            <Text style={styles.recentChannel}>in Video Consult</Text>
+          <View style={styles.symptomHeading}>
+            <Text style={styles.symptomTitle}>Find Doctor by Symptoms</Text>
+            <Text style={styles.viewAll}>View All</Text>
           </View>
-
-          <View style={styles.promoRow}>
-            <View style={styles.promoPeek}>
-              <Image
-                source={require('./assets/images/home/promo-peek.png')}
-                style={styles.promoPeekImage}
-                resizeMode="cover"
-              />
-            </View>
-            <LinearGradient
-              colors={['#332e80', '#a75dea']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.promoCard}
-            >
-              <View style={styles.promoTextBlock}>
-                <Text style={styles.promoTitle}>Ask Care AI</Text>
-                <Text style={styles.promoDesc}>
-                  Get trustworthy, instant &amp; free answers to your health
-                  queries
-                </Text>
-                <Pressable style={styles.askNow}>
-                  <Text style={styles.askNowText}>Ask Now</Text>
-                </Pressable>
-              </View>
-              <Image
-                source={require('./assets/images/home/ai-illustration.png')}
-                style={styles.promoIllustration}
-                resizeMode="cover"
-              />
-            </LinearGradient>
-          </View>
-
-          <Text style={[styles.sectionHeading, { marginTop: 40 }]}>
-            Find Care
-          </Text>
-          <View style={styles.findCareCard} />
         </View>
       </ScrollView>
-
-      {/* Primary navigation (Figma 34:602) */}
-      <View style={[styles.navWrap, { bottom: 0 }]}>
-        <LinearGradient
-          colors={['#e7e4ef', '#dedce9']}
-          style={styles.navBar}
-        >
-          {TABS.map((tab) => {
-            const selected = activeTab === tab.key;
-            return (
-              <Pressable
-                key={tab.key}
-                style={[styles.tab, selected && styles.tabSelected]}
-                onPress={() => setActiveTab(tab.key)}
-              >
-                <SvgXml
-                  xml={tabIcon(tab.key, selected)}
-                  width={tab.key === 'inPerson' ? 27 : 24}
-                  height={tab.key === 'inPerson' ? 29 : 23}
-                />
-                <Text
-                  style={[styles.tabLabel, selected && styles.tabLabelSelected]}
-                >
-                  {tab.label}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </LinearGradient>
-        <View
-          style={[styles.gestureArea, { height: 16 + insets.bottom }]}
-        >
-          <View style={styles.homeIndicator} />
-        </View>
-      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#f2effc' },
-  locationRow: {
+  root: { flex: 1, backgroundColor: '#efedff' },
+  header: {
+    position: 'relative',
+    borderBottomWidth: 1,
+    borderBottomColor: '#d8d0e8',
+  },
+  topRow: {
+    position: 'absolute',
+    left: 14,
+    right: 14,
+    height: 34,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingLeft: 12,
-    gap: 9,
   },
-  locationText: {
-    fontFamily: 'Roboto_700Bold',
-    fontSize: 22,
-    color: '#160b37',
-  },
-  searchRow: {
-    flexDirection: 'row',
-    paddingHorizontal: 8,
-    gap: 11,
-    marginTop: 21,
-  },
-  searchBox: {
-    flex: 1,
-    height: 49,
-    backgroundColor: '#ffffff',
-    borderRadius: 17,
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingLeft: 15,
-    gap: 9,
-    shadowColor: 'rgba(39,26,61,0.19)',
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 1,
-    shadowRadius: 8,
-    elevation: 5,
-  },
-  searchInput: {
-    flex: 1,
-    fontFamily: 'Roboto_400Regular',
-    fontSize: 14,
-    color: '#160b37',
-    outlineWidth: 0,
-  },
-  askPill: {
-    width: 76,
-    height: 49,
-    borderRadius: 17,
-    borderWidth: 1.6,
-    borderColor: '#ae7bdf',
+  backButton: {
+    width: 25,
+    height: 24,
     alignItems: 'center',
     justifyContent: 'center',
-    overflow: 'hidden',
   },
-  askSparkles: { position: 'absolute', top: 4, right: 10 },
-  askLine1: {
+  backIcon: { width: 25, height: 16 },
+  headerTitle: {
+    marginLeft: 13,
+    fontFamily: 'Roboto_700Bold',
+    fontSize: 13.5,
+    color: '#6b52ae',
+  },
+  locationGroup: {
+    position: 'absolute',
+    right: 19,
+    width: 139,
+    height: 34,
+  },
+  locationCaption: {
+    position: 'absolute',
+    top: 0,
+    left: 18,
     fontFamily: 'Roboto_400Regular',
-    fontSize: 14,
-    lineHeight: 16,
-    color: '#160b37',
+    fontSize: 12.5,
+    lineHeight: 15,
+    color: '#999c9c',
   },
-  askLine2: {
-    fontFamily: 'Roboto_600SemiBold',
-    fontSize: 16,
-    lineHeight: 18,
-    color: '#9564d2',
+  locationPin: {
+    position: 'absolute',
+    left: 0,
+    top: 17,
+    width: 11,
+    height: 15,
   },
-  services: {
-    marginTop: 13,
-    backgroundColor: '#ffffff',
-    borderBottomLeftRadius: 22,
-    borderBottomRightRadius: 22,
-    paddingTop: 2,
-    paddingHorizontal: 8,
-    paddingBottom: 24,
+  locationValue: {
+    position: 'absolute',
+    top: 18,
+    left: 18,
+    fontFamily: 'Roboto_700Bold',
+    fontSize: 12.5,
+    lineHeight: 15,
+    color: '#1d1b26',
   },
-  consultRow: { flexDirection: 'row', gap: 8 },
-  consultCard: {
-    flex: 1,
-    height: 102,
-    borderRadius: 17,
-    overflow: 'hidden',
-  },
-  consultCardPress: {
-    flex: 1,
-    height: 102,
-    borderRadius: 17,
-  },
-  consultCardFill: {
-    flex: 1,
-    borderRadius: 17,
-    overflow: 'hidden',
-  },
-  consultTitle: {
-    fontFamily: 'Roboto_600SemiBold',
-    fontSize: 16.5,
-    lineHeight: 18.5,
-    color: '#160b37',
-    marginTop: 13,
-    marginLeft: 12,
-  },
-  doctorPortrait: {
+  locationChange: {
     position: 'absolute',
     right: 0,
-    bottom: 0,
-    width: 80,
-    height: 51,
+    top: 22,
+    width: 10,
+    height: 7,
   },
-  doctorFace: {
+  searchBox: {
     position: 'absolute',
-    right: 9,
-    top: 30,
-    width: 41,
-    height: 31,
-  },
-  videoCall: {
-    position: 'absolute',
-    right: 10,
-    bottom: 0,
-    width: 47,
-    height: 71,
-  },
-  shortcutRow: { flexDirection: 'row', gap: 9, marginTop: 13 },
-  shortcut: {
-    flex: 1,
-    height: 103,
-    backgroundColor: '#ffffff',
+    left: 14,
+    right: 14,
+    height: 48,
+    borderRadius: 12,
     borderWidth: 1,
-    borderColor: '#e1dcf5',
-    borderRadius: 17,
-    alignItems: 'center',
-    shadowColor: 'rgba(53,35,66,0.19)',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 1,
-    shadowRadius: 2,
-    elevation: 3,
-  },
-  shortcutIcon: { width: 47, height: 47, marginTop: 8 },
-  shortcutLabel: {
-    fontFamily: 'Roboto_500Medium',
-    fontSize: 12,
-    lineHeight: 13.5,
-    color: '#160b37',
-    textAlign: 'center',
-    marginTop: 7,
-    width: '100%',
-    paddingHorizontal: 1,
-  },
-  recentSection: { paddingHorizontal: 8, paddingTop: 31 },
-  sectionHeading: {
-    fontFamily: 'Roboto_600SemiBold',
-    fontSize: 19,
-    color: '#160b37',
-  },
-  recentCard: {
-    width: 134,
-    height: 82,
+    borderColor: '#d8d0e8',
     backgroundColor: '#ffffff',
-    borderRadius: 16,
-    marginTop: 11,
-  },
-  physicianIcon: { width: 37, height: 30, marginLeft: 16, marginTop: 8 },
-  recentSpecialty: {
-    fontFamily: 'Roboto_600SemiBold',
-    fontSize: 12.5,
-    color: '#160b37',
-    marginLeft: 16,
-    marginTop: 4,
-  },
-  recentChannel: {
-    fontFamily: 'Roboto_400Regular',
-    fontSize: 12.5,
-    color: '#160b37',
-    marginLeft: 16,
-    marginTop: 1,
-  },
-  promoRow: { flexDirection: 'row', marginTop: 29, marginLeft: -8 },
-  promoPeek: {
-    width: 28,
-    height: 109,
-    borderTopRightRadius: 16,
-    borderBottomRightRadius: 16,
-    overflow: 'hidden',
-  },
-  promoPeekImage: { width: 28, height: 109 },
-  promoCard: {
-    flex: 1,
-    height: 109,
-    borderRadius: 16,
-    marginLeft: 12,
-    overflow: 'hidden',
     flexDirection: 'row',
-  },
-  promoTextBlock: { flex: 1, paddingLeft: 15, paddingTop: 11 },
-  promoTitle: {
-    fontFamily: 'Roboto_500Medium',
-    fontSize: 16,
-    color: '#ffffff',
-  },
-  promoDesc: {
-    fontFamily: 'Roboto_400Regular',
-    fontSize: 14,
-    lineHeight: 16.5,
-    color: '#ffffff',
-    marginTop: 4,
-    width: 191,
-  },
-  askNow: {
-    width: 82,
-    height: 23,
-    backgroundColor: '#ffffff',
-    borderRadius: 50,
     alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 6,
+    paddingHorizontal: 13,
+    gap: 11,
   },
-  askNowText: {
-    fontFamily: 'Roboto_600SemiBold',
-    fontSize: 11.5,
-    color: '#6451b7',
+  searchIcon: { width: 22, height: 24 },
+  searchInput: {
+    flex: 1,
+    padding: 0,
+    fontFamily: 'Roboto_400Regular',
+    fontSize: 15,
+    color: '#1d1b26',
+    outlineWidth: 0,
   },
-  promoIllustration: { width: 100, height: 109 },
-  findCareCard: {
-    width: 164,
-    height: 80,
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    marginTop: 28,
-  },
-  navWrap: { position: 'absolute', left: 0, right: 0 },
-  navBar: {
+  body: { minHeight: 635, paddingTop: 10 },
+  sectionTitle: {
+    height: 28,
     marginHorizontal: 14,
-    height: 78,
-    borderRadius: 50,
-    borderWidth: 1.2,
-    borderColor: '#ffffff',
+    fontFamily: 'Roboto_700Bold',
+    fontSize: 18,
+    lineHeight: 22,
+    color: '#1d1b26',
+  },
+  specialtyGrid: {
+    marginTop: 21,
+    marginHorizontal: 14,
     flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 5,
-    shadowColor: 'rgba(38,33,62,0.2)',
-    shadowOffset: { width: 0, height: 3 },
-    shadowOpacity: 1,
-    shadowRadius: 12,
-    elevation: 8,
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    rowGap: 26,
   },
-  tab: {
+  specialtyItem: { alignItems: 'center' },
+  iconShadow: {
+    width: 73,
+    height: 73,
+    borderRadius: 13,
+    backgroundColor: '#ffffff',
+    shadowColor: '#142533',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.22,
+    shadowRadius: 6,
+    elevation: 4,
+  },
+  iconCard: {
     flex: 1,
-    height: 66,
-    borderRadius: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 3,
+    borderRadius: 13,
+    overflow: 'hidden',
+    backgroundColor: '#ffffff',
   },
-  tabSelected: { backgroundColor: '#6650d6' },
-  tabLabel: {
+  specialtyImage: {
+    position: 'absolute',
+    top: 4,
+    left: 4,
+    width: 65,
+    height: 65,
+  },
+  specialtyName: {
+    width: 86,
+    marginTop: 9,
     fontFamily: 'Roboto_400Regular',
-    fontSize: 9.5,
-    lineHeight: 10,
-    color: '#160b37',
+    fontSize: 12,
+    lineHeight: 16,
+    color: '#1d1b26',
     textAlign: 'center',
   },
-  tabLabelSelected: {
-    fontFamily: 'Roboto_500Medium',
-    fontSize: 10,
-    color: '#ffffff',
-  },
-  gestureArea: {
-    backgroundColor: '#ffffff',
-    marginTop: 8,
+  symptomHeading: {
+    marginTop: 41,
+    marginHorizontal: 14,
+    height: 28,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
-  homeIndicator: {
-    width: 122,
-    height: 4,
-    borderRadius: 4,
-    backgroundColor: '#858585',
-    marginTop: 5,
+  symptomTitle: {
+    fontFamily: 'Roboto_700Bold',
+    fontSize: 17.5,
+    color: '#1d1b26',
+  },
+  viewAll: {
+    fontFamily: 'Roboto_700Bold',
+    fontSize: 15,
+    color: '#6b52ae',
   },
 });

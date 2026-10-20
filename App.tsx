@@ -65,7 +65,7 @@ export default function App() {
       ) : screen === 'consult' ? (
         <ConsultScreen onBack={() => setScreen('home')} />
       ) : (
-        <HomeScreen onVideoConsult={() => setScreen('consult')} />
+        <HomeScreen onOnlineConsult={() => setScreen('consult')} />
       )}
     </SafeAreaProvider>
   );
