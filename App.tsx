@@ -1,6 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -33,11 +36,6 @@ const ICONS = {
   mail: `<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g id="mail">
 <path id="Vector" d="M18.334 5.83375L10.8409 10.6058C10.5866 10.7534 10.2978 10.8312 10.0038 10.8312C9.7097 10.8312 9.42087 10.7534 9.1666 10.6058L1.666 5.83375M3.3328 3.334H16.6672C17.5877 3.334 18.334 4.08012 18.334 5.0005V14.9995C18.334 15.9199 17.5877 16.666 16.6672 16.666H3.3328C2.41225 16.666 1.666 15.9199 1.666 14.9995V5.0005C1.666 4.08012 2.41225 3.334 3.3328 3.334Z" stroke="#7379B1" stroke-width="1.6" stroke-linecap="round"/>
-</g>
-</svg>`,
-  arrowRight: `<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="arrow-right">
-<path id="Vector" d="M4.166 10H15.834M10 15.834L15.834 10L10 4.166" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
 </g>
 </svg>`,
   lock: `<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -75,7 +73,22 @@ function LoginScreen({ onProceed }: { onProceed: () => void }) {
   const insets = useSafeAreaInsets();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const [fontsLoaded] = useFonts({ Inter_400Regular, Inter_600SemiBold });
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener('keyboardDidShow', () =>
+      setKeyboardVisible(true),
+    );
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () =>
+      setKeyboardVisible(false),
+    );
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
 
   if (!fontsLoaded) {
     return null;
@@ -84,72 +97,99 @@ function LoginScreen({ onProceed }: { onProceed: () => void }) {
   return (
     <View style={styles.root}>
       <StatusBar style="dark" />
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <View style={[styles.header, { paddingTop: insets.top }]}>
-          <Image
-            source={require('./assets/images/pediatrician.png')}
-            style={{ width: 348, height: 348 }}
-            resizeMode="contain"
-          />
-        </View>
-        <View style={styles.form}>
-          <View style={styles.fieldsGroup}>
-            <View>
-              <Text style={styles.label}>Name</Text>
-              <View style={styles.input}>
-                <SvgXml xml={ICONS.user} width={20} height={20} />
-                <TextInput
-                  style={styles.textInput}
-                  value={name}
-                  onChangeText={setName}
-                  placeholder="Enter your full name"
-                  placeholderTextColor="#9695a2"
-                />
-              </View>
-            </View>
-            <View>
-              <Text style={styles.label}>Email</Text>
-              <View style={styles.input}>
-                <SvgXml xml={ICONS.mail} width={20} height={20} />
-                <TextInput
-                  style={styles.textInput}
-                  value={email}
-                  onChangeText={setEmail}
-                  placeholder="Enter your email address"
-                  placeholderTextColor="#9695a2"
-                  keyboardType="email-address"
-                  autoCapitalize="none"
-                />
-              </View>
-            </View>
-          </View>
-          <Pressable
-            style={({ pressed }) => [
-              styles.button,
-              pressed && { opacity: 0.85 },
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoiding}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+        >
+          <View
+            style={[
+              styles.header,
+              {
+                paddingTop: insets.top,
+                height: keyboardVisible ? 160 + insets.top : 420,
+              },
             ]}
-            onPress={onProceed}
           >
-            <Text style={styles.buttonText}>Proceed to login</Text>
-            <SvgXml xml={ICONS.arrowRight} width={20} height={20} />
-          </Pressable>
-          <View style={styles.privacyRow}>
-            <SvgXml xml={ICONS.lock} width={13} height={13} />
-            <Text style={styles.privacyText}>
-              Your details are safe with us.
-            </Text>
+            <Image
+              source={require('./assets/images/pediatrician.png')}
+              style={{
+                width: keyboardVisible ? 156 : 348,
+                height: keyboardVisible ? 156 : 348,
+              }}
+              resizeMode="contain"
+            />
           </View>
-        </View>
-      </ScrollView>
+          <View style={[styles.form, keyboardVisible && styles.formKeyboard]}>
+            <View
+              style={[
+                styles.fieldsGroup,
+                keyboardVisible && styles.fieldsGroupKeyboard,
+              ]}
+            >
+              <View>
+                <Text style={styles.label}>Name</Text>
+                <View style={styles.input}>
+                  <SvgXml xml={ICONS.user} width={20} height={20} />
+                  <TextInput
+                    style={styles.textInput}
+                    value={name}
+                    onChangeText={setName}
+                    onFocus={() => setKeyboardVisible(true)}
+                    placeholder="Enter your full name"
+                    placeholderTextColor="#9695a2"
+                  />
+                </View>
+              </View>
+              <View>
+                <Text style={styles.label}>Email</Text>
+                <View style={styles.input}>
+                  <SvgXml xml={ICONS.mail} width={20} height={20} />
+                  <TextInput
+                    style={styles.textInput}
+                    value={email}
+                    onChangeText={setEmail}
+                    onFocus={() => setKeyboardVisible(true)}
+                    placeholder="Enter your email address"
+                    placeholderTextColor="#9695a2"
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                  />
+                </View>
+              </View>
+            </View>
+            <Pressable
+              style={({ pressed }) => [
+                styles.button,
+                pressed && { opacity: 0.85 },
+              ]}
+              onPress={onProceed}
+            >
+              <Text style={styles.buttonText}>Proceed to login</Text>
+            </Pressable>
+            <View style={styles.privacyRow}>
+              <SvgXml xml={ICONS.lock} width={13} height={13} />
+              <Text style={styles.privacyText}>
+                Your details are safe with us.
+              </Text>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#efedff' },
+  root: { flex: 1, backgroundColor: '#ffffff' },
+  keyboardAvoiding: { flex: 1 },
   scroll: { flexGrow: 1 },
   header: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#ffffff',
     height: 420,
     borderBottomLeftRadius: 32,
     borderBottomRightRadius: 32,
@@ -157,7 +197,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   form: { paddingTop: 28, paddingHorizontal: 32, paddingBottom: 40, gap: 28 },
+  formKeyboard: { paddingTop: 12, paddingBottom: 16, gap: 16 },
   fieldsGroup: { gap: 20 },
+  fieldsGroupKeyboard: { gap: 12 },
   label: {
     fontFamily: 'Inter_600SemiBold',
     fontSize: 14,
@@ -165,7 +207,7 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   input: {
-    backgroundColor: '#fcfbfe',
+    backgroundColor: '#ffffff',
     borderWidth: 1,
     borderColor: '#e3e1eb',
     borderRadius: 14,

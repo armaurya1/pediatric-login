@@ -1,6 +1,9 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   Image,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -19,11 +22,6 @@ import {
 
 // SVG icons downloaded fresh from Figma (file q4OVzpZDgUgZoTikqnYWoh, node 3:5)
 const ICONS = {
-  arrowRight: `<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="Continue arrow">
-<path id="Arrow" d="M4.166 10H15.834M10 15.834L15.834 10L10 4.166" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
-</g>
-</svg>`,
   lock: `<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g id="Privacy lock" clip-path="url(#clip0_0_4)">
 <path id="Lock" d="M3.79167 5.41658V3.79145C3.79167 3.0731 4.07701 2.38417 4.58492 1.87622C5.09283 1.36826 5.78171 1.0829 6.5 1.0829C7.21829 1.0829 7.90717 1.36826 8.41508 1.87622C8.92299 2.38417 9.20833 3.0731 9.20833 3.79145V5.41658M7.04167 8.66684C7.04167 8.96602 6.79915 9.20855 6.5 9.20855C6.20085 9.20855 5.95833 8.96602 5.95833 8.66684C5.95833 8.36766 6.20085 8.12513 6.5 8.12513C6.79915 8.12513 7.04167 8.36766 7.04167 8.66684ZM2.70833 5.41658H10.2917C10.89 5.41658 11.375 5.90164 11.375 6.5V10.8337C11.375 11.432 10.89 11.9171 10.2917 11.9171H2.70833C2.11002 11.9171 1.625 11.432 1.625 10.8337V6.5C1.625 5.90164 2.11002 5.41658 2.70833 5.41658Z" stroke="#737581" stroke-width="1.6" stroke-linecap="round"/>
@@ -46,8 +44,23 @@ export default function VerificationScreen({ onVerify }: Props) {
   const insets = useSafeAreaInsets();
   const [digits, setDigits] = useState<string[]>(Array(CODE_LENGTH).fill(''));
   const [focused, setFocused] = useState(0);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
   const inputs = useRef<({ focus: () => void } | null)[]>([]);
   const [fontsLoaded] = useFonts({ Inter_400Regular, Inter_600SemiBold });
+
+  useEffect(() => {
+    const showSubscription = Keyboard.addListener('keyboardDidShow', () =>
+      setKeyboardVisible(true),
+    );
+    const hideSubscription = Keyboard.addListener('keyboardDidHide', () =>
+      setKeyboardVisible(false),
+    );
+
+    return () => {
+      showSubscription.remove();
+      hideSubscription.remove();
+    };
+  }, []);
 
   if (!fontsLoaded) {
     return null;
@@ -101,93 +114,116 @@ export default function VerificationScreen({ onVerify }: Props) {
   return (
     <View style={styles.root}>
       <StatusBar style="dark" />
-      <ScrollView contentContainerStyle={styles.scroll}>
-        {/* Header panel — same illustration as the login screen (Figma 3:6 / 3:7) */}
-        <View style={[styles.header, { paddingTop: insets.top }]}>
-          <Image
-            source={require('./assets/images/pediatrician.png')}
-            style={{ width: 348, height: 348 }}
-            resizeMode="contain"
-          />
-        </View>
-
-        {/* Verification form (Figma 3:8) */}
-        <View style={styles.form}>
-          <View style={styles.instructions}>
-            <Text style={styles.title}>Verify your email</Text>
-            <Text style={styles.subtitle}>
-              Enter the 6-digit code we sent to your email address.
-            </Text>
-          </View>
-
-          <View style={styles.codeRow}>
-            {digits.map((digit, index) => (
-              <View
-                key={index}
-                style={[
-                  styles.digitBox,
-                  focused === index && styles.digitBoxFocused,
-                ]}
-              >
-                <TextInput
-                  ref={(el) => {
-                    inputs.current[index] = el as { focus: () => void } | null;
-                  }}
-                  style={styles.digitInput}
-                  value={digit}
-                  onChangeText={(text) => handleChange(text, index)}
-                  onKeyPress={({ nativeEvent }) =>
-                    handleKeyPress(nativeEvent.key, index)
-                  }
-                  onFocus={() => setFocused(index)}
-                  keyboardType="number-pad"
-                  inputMode="numeric"
-                  textContentType="oneTimeCode"
-                  autoComplete="sms-otp"
-                  maxLength={1}
-                  cursorColor="#7379b1"
-                  selectionColor="#7379b1"
-                  autoFocus={index === 0}
-                />
-              </View>
-            ))}
-          </View>
-
-          <Pressable
-            style={({ pressed }) => [
-              styles.button,
-              pressed && { opacity: 0.85 },
+      <KeyboardAvoidingView
+        style={styles.keyboardAvoiding}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <ScrollView
+          contentContainerStyle={styles.scroll}
+          keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={Platform.OS === 'ios' ? 'interactive' : 'on-drag'}
+        >
+          {/* Header panel — same illustration as the login screen (Figma 3:6 / 3:7) */}
+          <View
+            style={[
+              styles.header,
+              {
+                paddingTop: insets.top,
+                height: keyboardVisible ? 160 + insets.top : 420,
+              },
             ]}
-            onPress={handleVerify}
           >
-            <Text style={styles.buttonText}>Verify code</Text>
-            <SvgXml xml={ICONS.arrowRight} width={20} height={20} />
-          </Pressable>
-
-          <Text style={styles.resendText}>
-            {"Didn't receive the code? "}
-            <Text style={styles.resendLink} onPress={handleResend}>
-              Resend code
-            </Text>
-          </Text>
-
-          <View style={styles.privacyRow}>
-            <SvgXml xml={ICONS.lock} width={13} height={13} />
-            <Text style={styles.privacyText}>
-              Your details are safe with us.
-            </Text>
+            <Image
+              source={require('./assets/images/pediatrician.png')}
+              style={{
+                width: keyboardVisible ? 156 : 348,
+                height: keyboardVisible ? 156 : 348,
+              }}
+              resizeMode="contain"
+            />
           </View>
-        </View>
-      </ScrollView>
+
+          {/* Verification form (Figma 3:8) */}
+          <View style={[styles.form, keyboardVisible && styles.formKeyboard]}>
+            <View style={styles.instructions}>
+              <Text style={styles.title}>Verify your email</Text>
+              <Text style={styles.subtitle}>
+                Enter the 6-digit code we sent to your email address.
+              </Text>
+            </View>
+
+            <View style={styles.codeRow}>
+              {digits.map((digit, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.digitBox,
+                    focused === index && styles.digitBoxFocused,
+                  ]}
+                >
+                  <TextInput
+                    ref={(el) => {
+                      inputs.current[index] = el as { focus: () => void } | null;
+                    }}
+                    style={styles.digitInput}
+                    value={digit}
+                    onChangeText={(text) => handleChange(text, index)}
+                    onKeyPress={({ nativeEvent }) =>
+                      handleKeyPress(nativeEvent.key, index)
+                    }
+                    onFocus={() => {
+                      setFocused(index);
+                      setKeyboardVisible(true);
+                    }}
+                    keyboardType="number-pad"
+                    inputMode="numeric"
+                    textContentType="oneTimeCode"
+                    autoComplete="sms-otp"
+                    maxLength={1}
+                    cursorColor="#7379b1"
+                    selectionColor="#7379b1"
+                    autoFocus={index === 0}
+                  />
+                </View>
+              ))}
+            </View>
+
+            <Pressable
+              style={({ pressed }) => [
+                styles.button,
+                pressed && { opacity: 0.85 },
+              ]}
+              onPress={handleVerify}
+            >
+              <Text style={styles.buttonText}>Verify code</Text>
+            </Pressable>
+
+            <Text style={styles.resendText}>
+              {"Didn't receive the code? "}
+              <Text style={styles.resendLink} onPress={handleResend}>
+                Resend code
+              </Text>
+            </Text>
+
+            <View style={styles.privacyRow}>
+              <SvgXml xml={ICONS.lock} width={13} height={13} />
+              <Text style={styles.privacyText}>
+                Your details are safe with us.
+              </Text>
+            </View>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#efedff' },
+  root: { flex: 1, backgroundColor: '#ffffff' },
+  keyboardAvoiding: { flex: 1 },
   scroll: { flexGrow: 1 },
   header: {
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#ffffff',
     height: 420,
     borderBottomLeftRadius: 32,
     borderBottomRightRadius: 32,
@@ -195,6 +231,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   form: { paddingTop: 28, paddingHorizontal: 32, gap: 24 },
+  formKeyboard: { paddingTop: 12, paddingBottom: 12, gap: 16 },
   instructions: { gap: 8 },
   title: {
     fontFamily: 'Inter_600SemiBold',
@@ -214,7 +251,7 @@ const styles = StyleSheet.create({
     flexBasis: 0,
     minWidth: 0,
     height: 56,
-    backgroundColor: '#fcfbfe',
+    backgroundColor: '#ffffff',
     borderWidth: 1,
     borderColor: '#e3e1eb',
     borderRadius: 14,
