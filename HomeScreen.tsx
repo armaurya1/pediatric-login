@@ -13,6 +13,7 @@ import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SvgXml } from 'react-native-svg';
+import { Inter_700Bold } from '@expo-google-fonts/inter';
 import {
   Roboto_400Regular,
   Roboto_500Medium,
@@ -87,6 +88,7 @@ export default function HomeScreen({ onOnlineConsult }: Props) {
   const { width: windowWidth } = useWindowDimensions();
   const [activeTab, setActiveTab] = useState<TabKey>('home');
   const [fontsLoaded] = useFonts({
+    Inter_700Bold,
     Roboto_400Regular,
     Roboto_500Medium,
     Roboto_600SemiBold,
@@ -321,10 +323,29 @@ export default function HomeScreen({ onOnlineConsult }: Props) {
             </LinearGradient>
           </ScrollView>
 
-          <Text style={[styles.sectionHeading, { marginTop: 40 }]}>
-            Find Care
-          </Text>
-          <View style={styles.findCareCard} />
+          <View
+            style={[
+              styles.footerIllustration,
+              { width: windowWidth, height: windowWidth / 2 },
+            ]}
+          >
+            <Image
+              source={require('./assets/images/home/footer-ambulance.png')}
+              style={styles.footerImage}
+              resizeMode="cover"
+            />
+            <View
+              style={[
+                styles.hospitalLabel,
+                {
+                  left: (40 * windowWidth) / 360,
+                  top: (69 * windowWidth) / 360,
+                },
+              ]}
+            >
+              <Text style={styles.hospitalLabelText}>MAA SAKTI HOSPITAL</Text>
+            </View>
+          </View>
         </View>
       </ScrollView>
 
@@ -691,12 +712,29 @@ const styles = StyleSheet.create({
     color: '#6451b7',
   },
   promoIllustration: { width: 100, height: 109 },
-  findCareCard: {
-    width: 164,
-    height: 80,
-    backgroundColor: '#ffffff',
-    borderRadius: 16,
-    marginTop: 28,
+  footerIllustration: {
+    position: 'relative',
+    marginTop: 32,
+    marginHorizontal: -8,
+    overflow: 'hidden',
+  },
+  footerImage: { ...StyleSheet.absoluteFillObject },
+  hospitalLabel: {
+    position: 'absolute',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 6,
+    backgroundColor: 'transparent',
+    shadowColor: '#6b59b2',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.18,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  hospitalLabelText: {
+    fontFamily: 'Inter_700Bold',
+    fontSize: 11,
+    color: '#5b4fcf',
   },
   navWrap: { position: 'absolute', left: 0, right: 0 },
   navBar: {
@@ -748,3 +786,4 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
 });
+
