@@ -266,7 +266,7 @@ export default function HomeScreen({ onOnlineConsult }: Props) {
               colors={['#332e80', '#a75dea']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
-              style={styles.affordableCard}
+              style={styles.promoOfferCard}
             >
               <Text style={styles.affordableTitle}>
                 Affordable Procedures{'\n'}by Expert Doctors
@@ -287,6 +287,35 @@ export default function HomeScreen({ onOnlineConsult }: Props) {
               <Image
                 source={require('./assets/images/home/affordable-procedures.png')}
                 style={styles.procedurePhoto}
+                resizeMode="cover"
+              />
+            </LinearGradient>
+
+            <LinearGradient
+              colors={['#332e80', '#a75dea']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.promoOfferCard}
+            >
+              <Text style={styles.fullBodyTitle}>
+                Full Body Checkups{'\n'}at Your Doorstep
+              </Text>
+              <Text style={styles.checkupList}>
+                70+ tests for a{'\n'}healthier tomorrow
+              </Text>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Book a checkup"
+                style={styles.bookCheckupButton}
+              >
+                <Text style={styles.bookCheckupButtonText}>Book a Checkup</Text>
+              </Pressable>
+              <Text style={styles.fullBodyInsurance}>
+                Certified labs &amp; home sample collection
+              </Text>
+              <Image
+                source={require('./assets/images/home/full-body-checkups.png')}
+                style={styles.checkupPhoto}
                 resizeMode="cover"
               />
             </LinearGradient>
@@ -516,7 +545,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
     flexDirection: 'row',
   },
-  affordableCard: {
+  promoOfferCard: {
     width: 312,
     height: 109,
     flexShrink: 0,
@@ -577,6 +606,61 @@ const styles = StyleSheet.create({
     top: 45,
     width: 111,
     height: 70,
+  },
+  fullBodyTitle: {
+    position: 'absolute',
+    left: 15,
+    top: 15,
+    width: 165,
+    fontFamily: 'Roboto_400Regular',
+    fontSize: 14,
+    lineHeight: 17,
+    color: '#ffffff',
+  },
+  checkupList: {
+    position: 'absolute',
+    left: 180,
+    top: 13,
+    width: 110,
+    fontFamily: 'Roboto_400Regular',
+    fontSize: 9,
+    lineHeight: 11,
+    color: '#ffffff',
+    textAlign: 'center',
+  },
+  bookCheckupButton: {
+    position: 'absolute',
+    left: 15,
+    top: 55,
+    width: 102,
+    height: 23,
+    borderRadius: 50,
+    backgroundColor: '#ffffff',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  bookCheckupButtonText: {
+    fontFamily: 'Roboto_400Regular',
+    fontSize: 11,
+    lineHeight: 14,
+    color: '#303794',
+  },
+  fullBodyInsurance: {
+    position: 'absolute',
+    left: 15,
+    top: 83,
+    width: 167,
+    fontFamily: 'Roboto_400Regular',
+    fontSize: 7.5,
+    lineHeight: 9,
+    color: '#ffffff',
+  },
+  checkupPhoto: {
+    position: 'absolute',
+    left: 182,
+    top: 42,
+    width: 111,
+    height: 76,
   },
   promoTextBlock: { flex: 1, paddingLeft: 15, paddingTop: 11 },
   promoTitle: {
