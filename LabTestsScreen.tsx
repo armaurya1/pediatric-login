@@ -55,21 +55,6 @@ const CHEVRON_RIGHT_SVG = `<svg overflow="visible" viewBox="0 0 16 16" fill="non
 </g>
 </svg>`;
 
-const SPARKLE_SVG = `<svg overflow="visible" viewBox="0 0 11 14" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path id="Sparkle" d="M5.5 0L7.5 5L11 7L7.5 9L5.5 14L3.5 9L0 7L3.5 5L5.5 0Z" fill="#F4BD71"/>
-</svg>`;
-
-const LIVER_SVG = `<svg overflow="visible" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-<g id="Liver illustration">
-<path id="Liver" d="M7 30.4589C7 14.4735 18.2018 14.4735 29.4036 17.6706C37.5504 19.802 44.6788 16.6049 52.8256 22.9991C60.9724 29.3932 55.8807 37.9187 48.7522 41.1158C39.5871 45.3785 31.4403 43.2472 26.3486 48.5756C16.1651 59.2325 7 49.6413 7 30.4589Z" fill="#E88973"/>
-<path id="Gallbladder" d="M30.2105 36C37.4463 38 35.3789 47 31.2442 49C27.1094 48 27.1094 41 30.2105 36Z" fill="#70AC8D"/>
-<path id="Liver detail" d="M30 20C34 27 33 33 28 39M32 29C38 25.6667 44.3333 24.6667 51 26" stroke="#C26B63" stroke-width="1.2" stroke-linecap="round"/>
-<path id="Liver highlight" d="M10 26.3362C12 19.125 19 19.125 28 21.1854L32 34.5776C26 37.6681 23 43.8491 17 46.9396C13 47.9698 10 35.6077 10 26.3362Z" fill="#F6A58B"/>
-<path id="Sparkle" d="M56.5 2L58.5 7L62 9L58.5 11L56.5 16L54.5 11L51 9L54.5 7L56.5 2Z" fill="#F4BD71"/>
-<path id="Sparkle_2" d="M45.5 46L47.5 51L51 53L47.5 55L45.5 60L43.5 55L40 53L43.5 51L45.5 46Z" fill="#F4BD71"/>
-</g>
-</svg>`;
-
 const TEST_TUBES_SVG = `<svg overflow="visible" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
 <g id="test-tubes">
 <path id="Vector" d="M8.625 1.9159V18.6881C8.625 19.3235 8.37258 19.933 7.92328 20.3823C7.47397 20.8317 6.86458 21.0841 6.22917 21.0841C5.59375 21.0841 4.98436 20.8317 4.53506 20.3823C4.08575 19.933 3.83333 19.3235 3.83333 18.6881V1.9159M19.1667 1.9159V18.6881C19.1667 19.3235 18.9142 19.933 18.4649 20.3823C18.0156 20.8317 17.4062 21.0841 16.7708 21.0841C16.1354 21.0841 15.526 20.8317 15.0767 20.3823C14.6274 19.933 14.375 19.3235 14.375 18.6881V1.9159M2.875 1.9159H9.58333M13.4167 1.9159H20.125M8.625 15.3336H3.83333M19.1667 15.3336H14.375" stroke="#CF7374" stroke-width="1.7" stroke-linecap="round"/>
@@ -96,83 +81,26 @@ const PLUS_SVG = `<svg overflow="visible" viewBox="0 0 10 10" fill="none" xmlns=
 
 type Category = {
   label: string;
-  kind: 'tubes' | 'capsules' | 'liver' | 'image';
-  image?: number;
+  image: number;
 };
 
 const CATEGORIES_1: Category[] = [
-  { label: 'Blood tests', kind: 'tubes' },
-  { label: 'Thyroid', kind: 'image', image: require('./assets/images/lab/cat-thyroid.png') },
-  { label: 'Diabetes', kind: 'image', image: require('./assets/images/lab/cat-diabetes.png') },
+  { label: 'Blood tests', image: require('./assets/images/lab/art-blood.png') },
+  { label: 'Thyroid', image: require('./assets/images/lab/cat-thyroid.png') },
+  { label: 'Diabetes', image: require('./assets/images/lab/cat-diabetes.png') },
 ];
 const CATEGORIES_2: Category[] = [
-  { label: 'Vitamins', kind: 'capsules' },
-  { label: 'Liver function', kind: 'liver' },
-  { label: 'Kidney function', kind: 'image', image: require('./assets/images/lab/cat-kidney.png') },
+  { label: 'Vitamins', image: require('./assets/images/lab/art-vitamins.png') },
+  { label: 'Liver function', image: require('./assets/images/lab/art-liver.png') },
+  { label: 'Kidney function', image: require('./assets/images/lab/cat-kidney.png') },
 ];
-
 const POPULAR = [
   { name: 'Complete Blood Count', sub: 'CBC \u2022 Blood sample', tint: '#ffe8e2', icon: TEST_TUBES_SVG },
   { name: 'Thyroid Profile', sub: 'T3, T4, TSH \u2022 Blood sample', tint: '#eee7f9', icon: FLASK_SVG },
   { name: 'Blood Glucose', sub: 'Fasting \u2022 Blood sample', tint: '#dff4ef', icon: DROPLET_SVG },
 ];
 
-function BloodTubesArt() {
-  const tube = (cap: string, sample: string, left: number, top: number) => (
-    <View style={{ position: 'absolute', left, top, width: 17, height: 43 }}>
-      <View style={{ position: 'absolute', left: 2, top: 5, width: 13, height: 38, backgroundColor: '#dfebf1', borderBottomLeftRadius: 7, borderBottomRightRadius: 7 }} />
-      <View style={{ position: 'absolute', left: 0, top: 0, width: 17, height: 9, backgroundColor: cap, borderRadius: 2 }} />
-      <View style={{ position: 'absolute', left: 4, top: 23, width: 9, height: 17, backgroundColor: sample, borderBottomLeftRadius: 5, borderBottomRightRadius: 5 }} />
-      <View style={{ position: 'absolute', left: 5, top: 12, width: 3, height: 10, backgroundColor: '#ffffff', borderRadius: 1.5 }} />
-    </View>
-  );
-  return (
-    <View style={{ width: 64, height: 64 }}>
-      {tube('#729dbb', '#ef8582', 13, 10)}
-      {tube('#a78bcb', '#e6676b', 34, 17)}
-      <View style={{ position: 'absolute', left: 49, top: 10 }}>
-        <SvgXml xml={SPARKLE_SVG} width={11} height={14} />
-      </View>
-    </View>
-  );
-}
-
-function VitaminCapsulesArt() {
-  const capsule = (bg: string, shell: string, shellLeft: number, highlight: string, width: number) => (
-    <View style={{ width, height: 19, backgroundColor: bg, borderRadius: 10, overflow: 'hidden' }}>
-      <View style={{ position: 'absolute', left: shellLeft, top: 0, width: width - 23, height: 19, backgroundColor: shell }} />
-      <View style={{ position: 'absolute', left: 7, top: 4, width: 12, height: 3, backgroundColor: highlight, borderRadius: 2 }} />
-    </View>
-  );
-  return (
-    <View style={{ width: 64, height: 64 }}>
-      <View style={{ position: 'absolute', left: 7, top: 4.63, width: 46.6, height: 45.268, alignItems: 'center', justifyContent: 'center' }}>
-        <View style={{ transform: [{ rotate: '-43deg' }] }}>
-          {capsule('#64b7ae', '#f4fcf9', 23, '#aee1d7', 46)}
-        </View>
-      </View>
-      <View style={{ position: 'absolute', left: -0.21, top: 22, width: 45.153, height: 42.195, alignItems: 'center', justifyContent: 'center' }}>
-        <View style={{ transform: [{ rotate: '40deg' }] }}>
-          {capsule('#f5b75d', '#fff4d8', 0, '#ffffff', 43)}
-        </View>
-      </View>
-      <View style={{ position: 'absolute', left: 47, top: 46 }}>
-        <SvgXml xml={SPARKLE_SVG} width={11} height={14} />
-      </View>
-      <View style={{ position: 'absolute', left: 58.33, top: 22 }}>
-        <SvgXml xml={SPARKLE_SVG} width={11} height={14} />
-      </View>
-    </View>
-  );
-}
-
-export default function LabTestsScreen({
-  onBack,
-  onHomeCollection,
-}: {
-  onBack: () => void;
-  onHomeCollection: () => void;
-}) {
+export default function LabTestsScreen({ onBack }: { onBack: () => void }) {
   const insets = useSafeAreaInsets();
   const [fontsLoaded] = useFonts({
     Roboto_400Regular,
@@ -188,15 +116,7 @@ export default function LabTestsScreen({
   const categoryCard = (item: Category) => (
     <View key={item.label} style={styles.category}>
       <View style={styles.categoryCard}>
-        {item.kind === 'tubes' ? (
-          <BloodTubesArt />
-        ) : item.kind === 'capsules' ? (
-          <VitaminCapsulesArt />
-        ) : item.kind === 'liver' ? (
-          <SvgXml xml={LIVER_SVG} width={64} height={64} />
-        ) : (
-          <Image source={item.image} style={styles.categoryImage} resizeMode="cover" />
-        )}
+        <Image source={item.image} style={styles.categoryImage} resizeMode="cover" />
       </View>
       <Text style={styles.categoryLabel}>{item.label}</Text>
     </View>
@@ -230,14 +150,14 @@ export default function LabTestsScreen({
 
       <ScrollView style={styles.scroll} contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         {/* Home sample collection banner */}
-        <Pressable style={styles.banner} onPress={onHomeCollection}>
+        <View style={styles.banner}>
           <SvgXml xml={KIT_SVG} width={60} height={60} />
           <View style={styles.bannerCopy}>
             <Text style={styles.bannerTitle}>Lab tests, from home</Text>
             <Text style={styles.bannerSub}>Choose home sample collection at checkout.</Text>
           </View>
           <SvgXml xml={CHEVRON_RIGHT_SVG} width={16} height={16} />
-        </Pressable>
+        </View>
 
         {/* Browse by category */}
         <View style={styles.section}>
