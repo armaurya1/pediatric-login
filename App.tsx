@@ -19,6 +19,7 @@ import {
   Inter_600SemiBold,
   useFonts,
 } from '@expo-google-fonts/inter';
+import VerificationScreen from './VerificationScreen';
 
 // SVG icons downloaded fresh from Figma (file q4OVzpZDgUgZoTikqnYWoh, node 2:84)
 const ICONS = {
@@ -50,14 +51,19 @@ const ICONS = {
 };
 
 export default function App() {
+  const [screen, setScreen] = useState<'login' | 'verification'>('login');
   return (
     <SafeAreaProvider>
-      <LoginScreen />
+      {screen === 'login' ? (
+        <LoginScreen onProceed={() => setScreen('verification')} />
+      ) : (
+        <VerificationScreen onVerify={() => setScreen('login')} />
+      )}
     </SafeAreaProvider>
   );
 }
 
-function LoginScreen() {
+function LoginScreen({ onProceed }: { onProceed: () => void }) {
   const insets = useSafeAreaInsets();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -114,6 +120,7 @@ function LoginScreen() {
               styles.button,
               pressed && { opacity: 0.85 },
             ]}
+            onPress={onProceed}
           >
             <Text style={styles.buttonText}>Proceed to login</Text>
             <SvgXml xml={ICONS.arrowRight} width={20} height={20} />
