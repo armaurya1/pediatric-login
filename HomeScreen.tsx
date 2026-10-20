@@ -77,7 +77,11 @@ const TABS = [
 
 type TabKey = (typeof TABS)[number]['key'];
 
-export default function HomeScreen() {
+export default function HomeScreen({
+  onVideoConsult,
+}: {
+  onVideoConsult: () => void;
+}) {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<TabKey>('home');
   const [fontsLoaded] = useFonts({
@@ -165,21 +169,23 @@ export default function HomeScreen() {
                 resizeMode="cover"
               />
             </LinearGradient>
-            <LinearGradient
-              colors={['#e8dff9', '#cba5f8']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.consultCard}
-            >
-              <Text style={styles.consultTitle}>
-                Video{'\n'}Consultation
-              </Text>
-              <Image
-                source={require('./assets/images/home/video-call.png')}
-                style={styles.videoCall}
-                resizeMode="cover"
-              />
-            </LinearGradient>
+            <Pressable style={styles.consultCardPress} onPress={onVideoConsult}>
+              <LinearGradient
+                colors={['#e8dff9', '#cba5f8']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={styles.consultCardFill}
+              >
+                <Text style={styles.consultTitle}>
+                  Video{'\n'}Consultation
+                </Text>
+                <Image
+                  source={require('./assets/images/home/video-call.png')}
+                  style={styles.videoCall}
+                  resizeMode="cover"
+                />
+              </LinearGradient>
+            </Pressable>
           </View>
 
           <View style={styles.shortcutRow}>
@@ -364,6 +370,16 @@ const styles = StyleSheet.create({
   consultCard: {
     flex: 1,
     height: 102,
+    borderRadius: 17,
+    overflow: 'hidden',
+  },
+  consultCardPress: {
+    flex: 1,
+    height: 102,
+    borderRadius: 17,
+  },
+  consultCardFill: {
+    flex: 1,
     borderRadius: 17,
     overflow: 'hidden',
   },

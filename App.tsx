@@ -21,6 +21,7 @@ import {
 } from '@expo-google-fonts/inter';
 import VerificationScreen from './VerificationScreen';
 import HomeScreen from './HomeScreen';
+import ConsultScreen from './ConsultScreen';
 
 // SVG icons downloaded fresh from Figma (file q4OVzpZDgUgZoTikqnYWoh, node 2:84)
 const ICONS = {
@@ -52,17 +53,19 @@ const ICONS = {
 };
 
 export default function App() {
-  const [screen, setScreen] = useState<'login' | 'verification' | 'home'>(
-    'login',
-  );
+  const [screen, setScreen] = useState<
+    'login' | 'verification' | 'home' | 'consult'
+  >('login');
   return (
     <SafeAreaProvider>
       {screen === 'login' ? (
         <LoginScreen onProceed={() => setScreen('verification')} />
       ) : screen === 'verification' ? (
         <VerificationScreen onVerify={() => setScreen('home')} />
+      ) : screen === 'consult' ? (
+        <ConsultScreen onBack={() => setScreen('home')} />
       ) : (
-        <HomeScreen />
+        <HomeScreen onVideoConsult={() => setScreen('consult')} />
       )}
     </SafeAreaProvider>
   );
