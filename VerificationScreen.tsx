@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react';
 import {
-  Alert,
   Image,
   Pressable,
   ScrollView,
@@ -85,13 +84,13 @@ export default function VerificationScreen({ onVerify }: Props) {
   };
 
   const handleVerify = () => {
-    if (digits.some((d) => !d)) {
-      Alert.alert('Incomplete code', 'Please enter all 6 digits.');
+    const firstEmpty = digits.findIndex((d) => !d);
+    if (firstEmpty !== -1) {
+      // Incomplete code: move focus to the first empty box
+      inputs.current[firstEmpty]?.focus();
       return;
     }
-    Alert.alert('Email verified', 'Your email has been verified.', [
-      { text: 'OK', onPress: onVerify },
-    ]);
+    onVerify();
   };
 
   const handleResend = () => {
