@@ -705,7 +705,11 @@ const styles = StyleSheet.create({
     marginHorizontal: -8,
     overflow: 'hidden',
   },
-  footerImage: { ...StyleSheet.absoluteFillObject },
+  footerImage: {
+    ...StyleSheet.absoluteFillObject,
+    width: '100%',
+    height: '100%',
+  },
   navWrap: { position: 'absolute', left: 0, right: 0 },
   navBar: {
     marginHorizontal: 14,
