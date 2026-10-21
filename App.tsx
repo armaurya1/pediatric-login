@@ -32,6 +32,8 @@ import VerificationScreen from './VerificationScreen';
 import HomeScreen from './HomeScreen';
 import ConsultScreen from './ConsultScreen';
 import DoctorDetailScreen from './DoctorDetailScreen';
+import MedicinesScreen from './MedicinesScreen';
+import LabTestsScreen from './LabTestsScreen';
 
 // SVG icons downloaded fresh from Figma (file q4OVzpZDgUgZoTikqnYWoh, node 2:84)
 const ICONS = {
@@ -67,7 +69,7 @@ export default function App() {
     Roboto_700Bold,
   });
   const [screen, setScreen] = useState<
-    'login' | 'verification' | 'home' | 'consult' | 'doctor'
+    'login' | 'verification' | 'home' | 'consult' | 'doctor' | 'medicines' | 'labTests'
   >('login');
   const [doctorFrom, setDoctorFrom] = useState<'home' | 'consult'>('home');
 
@@ -91,6 +93,10 @@ export default function App() {
         />
       ) : screen === 'doctor' ? (
         <DoctorDetailScreen onBack={() => setScreen(doctorFrom)} />
+      ) : screen === 'medicines' ? (
+        <MedicinesScreen onBack={() => setScreen('home')} />
+      ) : screen === 'labTests' ? (
+        <LabTestsScreen onBack={() => setScreen('home')} />
       ) : (
         <HomeScreen
           onOnlineConsult={() => setScreen('consult')}
@@ -98,6 +104,8 @@ export default function App() {
             setDoctorFrom('home');
             setScreen('doctor');
           }}
+          onMedicines={() => setScreen('medicines')}
+          onLabTests={() => setScreen('labTests')}
         />
       )}
     </SafeAreaProvider>

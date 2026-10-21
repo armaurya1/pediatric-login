@@ -81,9 +81,16 @@ type TabKey = (typeof TABS)[number]['key'];
 type Props = {
   onOnlineConsult: () => void;
   onDoctorProfile: () => void;
+  onMedicines?: () => void;
+  onLabTests?: () => void;
 };
 
-export default function HomeScreen({ onOnlineConsult, onDoctorProfile }: Props) {
+export default function HomeScreen({
+  onOnlineConsult,
+  onDoctorProfile,
+  onMedicines,
+  onLabTests,
+}: Props) {
   const insets = useSafeAreaInsets();
   const { width: windowWidth } = useWindowDimensions();
   const [activeTab, setActiveTab] = useState<TabKey>('home');
@@ -208,16 +215,31 @@ export default function HomeScreen({ onOnlineConsult, onDoctorProfile }: Props) 
           </View>
 
           <View style={styles.shortcutRow}>
-            {SHORTCUTS.map((item) => (
-              <View key={item.label} style={styles.shortcut}>
-                <Image
-                  source={item.image}
-                  style={styles.shortcutIcon}
-                  resizeMode="cover"
-                />
-                <Text style={styles.shortcutLabel}>{item.label}</Text>
-              </View>
-            ))}
+            {SHORTCUTS.map((item) => {
+              const isMedicines = item.label.includes('Medicines');
+              const isLabTests = item.label.includes('Lab');
+              const onPress = isMedicines ? onMedicines : isLabTests ? onLabTests : undefined;
+
+              return (
+                <Pressable
+                  key={item.label}
+                  style={({ pressed }) => [
+                    styles.shortcut,
+                    onPress && pressed && { opacity: 0.75, transform: [{ scale: 0.96 }] },
+                  ]}
+                  onPress={onPress}
+                  accessibilityRole={onPress ? 'button' : undefined}
+                  accessibilityLabel={item.label.replace('\n', ' ')}
+                >
+                  <Image
+                    source={item.image}
+                    style={styles.shortcutIcon}
+                    resizeMode="cover"
+                  />
+                  <Text style={styles.shortcutLabel}>{item.label}</Text>
+                </Pressable>
+              );
+            })}
           </View>
         </View>
 
