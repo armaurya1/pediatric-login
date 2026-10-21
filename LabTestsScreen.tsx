@@ -9,13 +9,6 @@ import {
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import {
-  Roboto_400Regular,
-  Roboto_500Medium,
-  Roboto_600SemiBold,
-  Roboto_700Bold,
-  useFonts,
-} from '@expo-google-fonts/roboto';
 import { SvgXml } from 'react-native-svg';
 
 // SVG assets downloaded from Figma node 70:153 (file q4OVzpZDgUgZoTikqnYWoh)
@@ -102,16 +95,6 @@ const POPULAR = [
 
 export default function LabTestsScreen({ onBack }: { onBack: () => void }) {
   const insets = useSafeAreaInsets();
-  const [fontsLoaded] = useFonts({
-    Roboto_400Regular,
-    Roboto_500Medium,
-    Roboto_600SemiBold,
-    Roboto_700Bold,
-  });
-
-  if (!fontsLoaded) {
-    return null;
-  }
 
   const categoryCard = (item: Category) => (
     <View key={item.label} style={styles.category}>
@@ -126,24 +109,38 @@ export default function LabTestsScreen({ onBack }: { onBack: () => void }) {
     <View style={[styles.root, { paddingTop: insets.top }]}>
       <StatusBar style="dark" />
 
-      {/* Lab tests header (Figma 70:154) */}
+      {/* Lab tests header */}
       <View style={styles.header}>
-        <Pressable style={styles.backButton} onPress={onBack} accessibilityLabel="Back">
-          <SvgXml xml={BACK_SVG} width={25} height={16} />
-        </Pressable>
-        <Text style={styles.headerTitle}>LAB TESTS</Text>
-        <Text style={styles.locationLabel}>Your Location:</Text>
-        <View style={styles.locationRow}>
-          <SvgXml xml={PIN_SVG} width={11} height={15} />
-          <Text style={styles.locationText}>Barabanki 225003</Text>
-          <SvgXml xml={CHEVRON_DOWN_SVG} width={10} height={7} />
+        <View style={styles.topRow}>
+          <View style={styles.titleGroup}>
+            <Pressable
+              style={styles.backButton}
+              onPress={onBack}
+              accessibilityLabel="Back"
+              hitSlop={8}
+            >
+              <SvgXml xml={BACK_SVG} width={25} height={16} />
+            </Pressable>
+            <Text style={styles.headerTitle} numberOfLines={1}>
+              LAB TESTS
+            </Text>
+          </View>
+
+          <View style={styles.locationRow}>
+            <SvgXml xml={PIN_SVG} width={11} height={15} />
+            <Text style={styles.locationText} numberOfLines={1}>
+              Barabanki 225003
+            </Text>
+            <SvgXml xml={CHEVRON_DOWN_SVG} width={10} height={7} />
+          </View>
         </View>
+
         <View style={styles.searchBar}>
           <SvgXml xml={SEARCH_SVG} width={22} height={22} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search tests, profiles & packages"
-            placeholderTextColor="#777382"
+            placeholder="Search tests, profiles & packages..."
+            placeholderTextColor="#7e8184"
           />
         </View>
       </View>
@@ -175,7 +172,7 @@ export default function LabTestsScreen({ onBack }: { onBack: () => void }) {
           <View style={styles.testList}>
             {POPULAR.map((t) => (
               <View key={t.name} style={styles.testCard}>
-                <View style={[styles.testSymbol, { backgroundColor: t.tint }]}>
+                <View style={styles.testSymbol}>
                   <SvgXml xml={t.icon} width={23} height={23} />
                 </View>
                 <View style={styles.testInfo}>
@@ -196,56 +193,47 @@ export default function LabTestsScreen({ onBack }: { onBack: () => void }) {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#efedff' },
+  root: { flex: 1, backgroundColor: '#ffffff' },
   header: {
-    height: 169,
+    paddingTop: 12,
+    paddingBottom: 14,
     borderBottomWidth: 1,
     borderBottomColor: '#d8d0e8',
-    position: 'relative',
+  },
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 14,
+  },
+  titleGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   backButton: {
-    position: 'absolute',
-    left: 14,
-    top: 61,
     width: 25,
     height: 16,
     justifyContent: 'center',
   },
   headerTitle: {
-    position: 'absolute',
-    left: 52,
-    top: 62,
     fontFamily: 'Roboto_700Bold',
     fontSize: 13.5,
     color: '#6b52ae',
   },
-  locationLabel: {
-    position: 'absolute',
-    left: 220,
-    top: 53,
-    fontFamily: 'Roboto_400Regular',
-    fontSize: 12.5,
-    color: '#999c9c',
-  },
   locationRow: {
-    position: 'absolute',
-    left: 202,
-    top: 70,
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
   },
   locationText: {
     fontFamily: 'Roboto_700Bold',
     fontSize: 12.5,
     color: '#1d1b26',
-    marginLeft: 7,
-    marginRight: 18,
   },
   searchBar: {
-    position: 'absolute',
-    left: 14,
-    top: 111,
-    width: 332,
+    marginTop: 14,
+    marginHorizontal: 14,
     height: 48,
     backgroundColor: '#ffffff',
     borderWidth: 1,
@@ -258,26 +246,30 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
+    height: '100%',
     fontFamily: 'Roboto_400Regular',
-    fontSize: 14,
+    fontSize: 15,
     color: '#1d1b26',
+    paddingVertical: 0,
     outlineWidth: 0,
   } as object,
   scroll: { flex: 1 },
   content: {
     paddingHorizontal: 14,
     paddingTop: 16,
-    paddingBottom: 22,
-    gap: 20,
+    paddingBottom: 30,
+    gap: 22,
   },
   banner: {
-    backgroundColor: '#e5def8',
+    backgroundColor: '#f5ede0',
     borderRadius: 16,
     height: 92,
-    paddingHorizontal: 13,
+    paddingHorizontal: 14,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 11,
+    gap: 12,
+    borderWidth: 1,
+    borderColor: '#ece4d4',
   },
   bannerCopy: { flex: 1, gap: 5 },
   bannerTitle: {
@@ -291,7 +283,7 @@ const styles = StyleSheet.create({
     lineHeight: 17,
     color: '#6b5d83',
   },
-  section: { gap: 13 },
+  section: { gap: 14 },
   sectionTitle: {
     fontFamily: 'Roboto_600SemiBold',
     fontSize: 18,
@@ -307,47 +299,68 @@ const styles = StyleSheet.create({
     fontSize: 12.5,
     color: '#6b52ae',
   },
-  categoryRow: { flexDirection: 'row', gap: 8 },
-  category: { flex: 1, alignItems: 'center', gap: 7 },
+  categoryRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginVertical: 4,
+  },
+  category: {
+    alignItems: 'center',
+    width: 86,
+  },
   categoryCard: {
-    width: 72,
-    height: 72,
-    backgroundColor: '#ffffff',
-    borderRadius: 14,
-    shadowColor: 'rgba(53, 39, 93, 0.09)',
-    shadowOffset: { width: 0, height: 3 },
-    shadowRadius: 5,
+    width: 73,
+    height: 73,
+    backgroundColor: '#f5ede0',
+    borderRadius: 13,
+    shadowColor: 'rgba(20, 37, 51, 0.22)',
+    shadowOffset: { width: 0, height: 4 },
+    shadowRadius: 6,
     shadowOpacity: 1,
-    elevation: 3,
+    elevation: 4,
+    padding: 4,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  categoryImage: { width: 64, height: 64, borderRadius: 8 },
+  categoryImage: {
+    width: 65,
+    height: 65,
+    borderRadius: 9,
+  },
   categoryLabel: {
     fontFamily: 'Roboto_400Regular',
     fontSize: 12,
     lineHeight: 16,
     color: '#1d1b26',
     textAlign: 'center',
+    marginTop: 8,
   },
-  testList: { gap: 8 },
+  testList: { gap: 10 },
   testCard: {
     backgroundColor: '#ffffff',
-    borderRadius: 12,
-    height: 66,
-    paddingHorizontal: 11,
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#ece8f5',
+    height: 68,
+    paddingHorizontal: 12,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: 12,
+    shadowColor: 'rgba(20, 37, 51, 0.06)',
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 4,
+    shadowOpacity: 1,
+    elevation: 2,
   },
   testSymbol: {
-    width: 36,
-    height: 40,
-    borderRadius: 10,
+    width: 42,
+    height: 42,
+    borderRadius: 12,
+    backgroundColor: '#f5ede0',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  testInfo: { flex: 1, gap: 5 },
+  testInfo: { flex: 1, gap: 4 },
   testName: {
     fontFamily: 'Roboto_600SemiBold',
     fontSize: 13.5,
@@ -364,7 +377,7 @@ const styles = StyleSheet.create({
     borderColor: '#d8d0e8',
     borderRadius: 8,
     height: 30,
-    paddingHorizontal: 9,
+    paddingHorizontal: 10,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
