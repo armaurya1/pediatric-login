@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import {
+  Animated,
   Image,
   Pressable,
   ScrollView,
@@ -8,6 +9,7 @@ import {
   View,
   useWindowDimensions,
 } from 'react-native';
+import type { ScrollViewInstance } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SvgXml } from 'react-native-svg';
@@ -44,6 +46,7 @@ const TIMES = [
   '10:30 AM', '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM',
   '01:00 PM', '01:30 PM', '02:00 PM', '02:30 PM', '03:00 PM',
 ];
+const DATE_ITEM_WIDTH = 44;
 const STATS = [
   { icon: HISTORY_SVG, value: '8 years', label: 'Experience' },
   { icon: USERS_SVG, value: '2.7K+', label: 'Patients' },
@@ -57,6 +60,8 @@ export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
   const [month, setMonth] = useState(1);
   const [day, setDay] = useState(5);
   const [time, setTime] = useState(0);
+  const [scrollX] = useState(() => new Animated.Value((5 - 1) * DATE_ITEM_WIDTH));
+  const dayScrollRef = useRef<ScrollViewInstance>(null);
   if (!fontsLoaded) return null;
 
   const selectedMonth = MONTHS[month];
@@ -68,8 +73,25 @@ export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
   const selectMonth = (nextMonth: number) => {
     const next = MONTHS[nextMonth];
     const lastDay = new Date(next.year, next.monthIndex + 1, 0).getDate();
+    const nextDay = Math.min(day, lastDay);
+    scrollX.setValue((nextDay - 1) * DATE_ITEM_WIDTH);
     setMonth(nextMonth);
-    setDay((currentDay) => Math.min(currentDay, lastDay));
+    setDay(nextDay);
+  };
+  const updateSelectedDay = (offset: number) => {
+    setDay(
+      Math.min(
+        daysInMonth,
+        Math.max(1, Math.round(offset / DATE_ITEM_WIDTH) + 1),
+      ),
+    );
+  };
+  const selectDay = (dateNumber: number) => {
+    setDay(dateNumber);
+    dayScrollRef.current?.scrollTo({
+      x: (dateNumber - 1) * DATE_ITEM_WIDTH,
+      animated: true,
+    });
   };
 
   const profileCardHeight = Math.max(
@@ -169,32 +191,62 @@ export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
           ))}
         </ScrollView>
 
-        <ScrollView
+        <Animated.ScrollView
+          ref={dayScrollRef}
           key={selectedMonth.key}
           horizontal
           style={[styles.dayRow, { width: windowWidth - 70 }]}
-          contentContainerStyle={styles.dayRowContent}
-          contentOffset={{ x: Math.max(0, (day - 4) * 44), y: 0 }}
+          contentContainerStyle={[
+            styles.dayRowContent,
+            { paddingHorizontal: Math.max(0, (windowWidth - 70 - DATE_ITEM_WIDTH) / 2) },
+          ]}
+          contentOffset={{ x: (day - 1) * DATE_ITEM_WIDTH, y: 0 }}
           showsHorizontalScrollIndicator={false}
           decelerationRate="fast"
-          snapToInterval={44}
+          snapToInterval={DATE_ITEM_WIDTH}
           snapToAlignment="start"
           nestedScrollEnabled
+          scrollEventThrottle={16}
+          onScroll={Animated.event(
+            [{ nativeEvent: { contentOffset: { x: scrollX } } }],
+            { useNativeDriver: true },
+          )}
+          onScrollEndDrag={({ nativeEvent }) =>
+            updateSelectedDay(nativeEvent.contentOffset.x)
+          }
+          onMomentumScrollEnd={({ nativeEvent }) =>
+            updateSelectedDay(nativeEvent.contentOffset.x)
+          }
         >
           {Array.from({ length: daysInMonth }, (_, index) => {
             const dateNumber = index + 1;
             const date = new Date(selectedMonth.year, selectedMonth.monthIndex, dateNumber);
             const active = dateNumber === day;
+            const itemCenterOffset = (dateNumber - 1) * DATE_ITEM_WIDTH;
+            const scale = scrollX.interpolate({
+              inputRange: [
+                itemCenterOffset - DATE_ITEM_WIDTH * 3,
+                itemCenterOffset - DATE_ITEM_WIDTH * 2,
+                itemCenterOffset - DATE_ITEM_WIDTH,
+                itemCenterOffset,
+                itemCenterOffset + DATE_ITEM_WIDTH,
+                itemCenterOffset + DATE_ITEM_WIDTH * 2,
+                itemCenterOffset + DATE_ITEM_WIDTH * 3,
+              ],
+              outputRange: [0.4, 0.62, 0.74, 1, 0.74, 0.62, 0.4],
+              extrapolate: 'clamp',
+            });
             return (
               <Pressable
                 key={dateNumber}
                 style={styles.dayOption}
-                onPress={() => setDay(dateNumber)}
+                onPress={() => selectDay(dateNumber)}
               >
-                <View
+                <Animated.View
                   style={[
                     styles.dayChip,
                     active && styles.dayChipActive,
+                    { transform: [{ scale }] },
                   ]}
                 >
                   <Text style={[styles.dayNum, active && styles.dayTextActive]}>
@@ -203,12 +255,19 @@ export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
                   <Text style={[styles.dayDow, active && styles.dayTextActive]}>
                     {date.toLocaleDateString('en-US', { weekday: 'short' })}
                   </Text>
-                </View>
+                </Animated.View>
                 {active && <View style={styles.dayDot} />}
               </Pressable>
             );
           })}
-        </ScrollView>
+        </Animated.ScrollView>
+        <View
+          pointerEvents="none"
+          style={[
+            styles.daySelectionMarker,
+            { left: 35 + (windowWidth - 70 - 54) / 2 },
+          ]}
+        />
 
         <Text style={[styles.heading, { top: 205 }]}>Select Time</Text>
         <ScrollView
@@ -369,7 +428,6 @@ const styles = StyleSheet.create({
   dayRowContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingRight: 8,
   },
   dayOption: {
     width: 44,
@@ -378,24 +436,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   dayChip: {
-    width: 38,
-    height: 54,
+    width: 54,
+    height: 68,
     backgroundColor: '#eaeaea',
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 4,
+    gap: 7,
   },
   dayChipActive: {
-    height: 68,
     backgroundColor: '#5937a0',
     borderWidth: 3,
     borderColor: '#dccbf5',
-    gap: 6,
   },
-  dayNum: { fontFamily: 'Roboto_500Medium', fontSize: 14, color: '#4b4b4b' },
-  dayDow: { fontFamily: 'Roboto_400Regular', fontSize: 8.5, color: '#665f68' },
+  dayNum: { fontFamily: 'Roboto_500Medium', fontSize: 18, color: '#4b4b4b' },
+  dayDow: { fontFamily: 'Roboto_400Regular', fontSize: 10, color: '#665f68' },
   dayTextActive: { color: '#ffffff' },
+  daySelectionMarker: {
+    position: 'absolute',
+    top: 107.5,
+    width: 54,
+    height: 68,
+    borderRadius: 12,
+    borderWidth: 3,
+    borderColor: '#dccbf5',
+  },
   dayDot: {
     position: 'absolute',
     bottom: 0,
