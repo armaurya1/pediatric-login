@@ -1,5 +1,14 @@
 import { useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import {
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  View,
+  useWindowDimensions,
+} from 'react-native';
+import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SvgXml } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
@@ -39,48 +48,67 @@ const STATS = [
 
 export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
   const insets = useSafeAreaInsets();
+  const { height: windowHeight, width: windowWidth } = useWindowDimensions();
   const [fontsLoaded] = useFonts({ Roboto_400Regular, Roboto_500Medium });
   const [month, setMonth] = useState(1);
   const [day, setDay] = useState(3);
   const [time, setTime] = useState(0);
   if (!fontsLoaded) return null;
 
+  const profileCardHeight = Math.max(
+    401,
+    Math.min(441, windowHeight * 0.55),
+  );
+  const portraitHeight = profileCardHeight - 84;
+  const navTop = Math.max(insets.top + 12, 24);
+
   return (
-    <View style={[styles.root, { paddingTop: insets.top }]}>
+    <ScrollView
+      style={styles.root}
+      contentContainerStyle={{ minHeight: windowHeight }}
+      showsVerticalScrollIndicator={false}
+    >
+      <StatusBar style="light" />
       {/* Profile card */}
-      <View style={styles.profileCard}>
-        <View style={styles.portrait}>
+      <View style={[styles.profileCard, { height: profileCardHeight }]}>
+        <View style={[styles.portrait, { height: portraitHeight }]}>
           <Image
-            source={require('./assets/images/doctor/doctor-photo.png')}
-            style={styles.photo}
+            source={require('./assets/images/doctor/doctor-photo.jpg')}
+            style={[styles.photo, { height: windowWidth * 2 }]}
             resizeMode="cover"
           />
           <LinearGradient
             colors={['rgba(171,133,220,0)', '#ad86de', '#ad86de']}
             locations={[0, 0.42, 1]}
-            style={styles.fade}
+            style={[styles.fade, { top: portraitHeight - 127 }]}
           />
-          <Pressable style={[styles.navBtn, styles.backBtn]} onPress={onBack} hitSlop={8}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Back to Home"
+            style={[styles.navBtn, styles.backBtn, { top: navTop }]}
+            onPress={onBack}
+            hitSlop={8}
+          >
             <SvgXml xml={CHEVRON_LEFT_SVG} width={17} height={17} />
           </Pressable>
-          <View style={[styles.navBtn, styles.heartBtn]}>
+          <View style={[styles.navBtn, styles.heartBtn, { top: navTop }]}>
             <SvgXml xml={HEART_SVG} width={17} height={17} />
           </View>
-          <Text style={styles.name}>Rohan Sharma</Text>
-          <View style={styles.specialtyRow}>
+          <Text style={[styles.name, { top: portraitHeight - 74 }]}>Rohan Sharma</Text>
+          <View style={[styles.specialtyRow, { top: portraitHeight - 46 }]}>
             <Text style={styles.specialty}>Neurologist</Text>
             <View style={styles.rating}>
               <SvgXml xml={STAR_SM_SVG} width={13} height={13} />
               <Text style={styles.ratingText}>4.8</Text>
             </View>
           </View>
-          <View style={[styles.actionBtn, { left: 199 }]}>
+          <View style={[styles.actionBtn, { left: windowWidth - 161, top: portraitHeight - 67 }]}>
             <SvgXml xml={CHAT_SVG} width={17} height={17} />
           </View>
-          <View style={[styles.actionBtn, { left: 249 }]}>
+          <View style={[styles.actionBtn, { left: windowWidth - 111, top: portraitHeight - 67 }]}>
             <SvgXml xml={PHONE_SVG} width={17} height={17} />
           </View>
-          <View style={[styles.actionBtn, { left: 300 }]}>
+          <View style={[styles.actionBtn, { left: windowWidth - 61, top: portraitHeight - 67 }]}>
             <SvgXml xml={VIDEO_SVG} width={18} height={18} />
           </View>
         </View>
@@ -101,9 +129,9 @@ export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
       </View>
 
       {/* Booking */}
-      <View style={styles.booking}>
+      <View style={[styles.booking, { height: Math.max(363, windowHeight - profileCardHeight) }]}>
         <Text style={[styles.heading, { top: 24 }]}>Select Date</Text>
-        <View style={styles.monthRow}>
+        <View style={[styles.monthRow, { width: windowWidth - 28 }]}>
           {MONTHS.map((m, i) => (
             <Pressable
               key={m}
@@ -115,7 +143,7 @@ export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
           ))}
         </View>
 
-        <View style={styles.dayRow}>
+        <View style={[styles.dayRow, { width: windowWidth - 70 }]}>
           {DAYS.map((d, i) => {
             const active = i === day;
             return (
@@ -153,7 +181,7 @@ export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
         </View>
 
         <Text style={[styles.heading, { top: 205 }]}>Select Time</Text>
-        <View style={styles.timeRow}>
+        <View style={[styles.timeRow, { width: windowWidth - 28 }]}>
           {TIMES.map((t, i) => {
             const active = i === time;
             return (
@@ -169,18 +197,17 @@ export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
           })}
         </View>
 
-        <Pressable style={styles.bookBtn}>
+        <Pressable style={[styles.bookBtn, { width: windowWidth - 34 }]}>
           <Text style={styles.bookText}>Book Appointment - $15/hr</Text>
         </Pressable>
       </View>
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#ffffff' },
   profileCard: {
-    height: 441,
     backgroundColor: '#ffffff',
     borderBottomLeftRadius: 40,
     borderBottomRightRadius: 40,
@@ -192,18 +219,16 @@ const styles = StyleSheet.create({
     zIndex: 1,
   },
   portrait: {
-    height: 357,
     backgroundColor: '#8262b8',
     borderBottomLeftRadius: 40,
     borderBottomRightRadius: 40,
     overflow: 'hidden',
     position: 'relative',
   },
-  photo: { position: 'absolute', left: 0, top: 0, width: '100%', height: 804 },
-  fade: { position: 'absolute', left: 0, top: 230, width: '100%', height: 127, opacity: 0.65 },
+  photo: { position: 'absolute', left: 0, top: 0, width: '100%' },
+  fade: { position: 'absolute', left: 0, width: '100%', height: 127, opacity: 0.65 },
   navBtn: {
     position: 'absolute',
-    top: 60,
     width: 46,
     height: 44,
     borderRadius: 23,
@@ -216,7 +241,7 @@ const styles = StyleSheet.create({
   name: {
     position: 'absolute',
     left: 20,
-    top: 283,
+    top: 0,
     fontFamily: 'Roboto_400Regular',
     fontSize: 20,
     color: '#ffffff',
@@ -224,7 +249,7 @@ const styles = StyleSheet.create({
   specialtyRow: {
     position: 'absolute',
     left: 20,
-    top: 311,
+    top: 0,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 9,
@@ -242,7 +267,7 @@ const styles = StyleSheet.create({
   ratingText: { fontFamily: 'Roboto_400Regular', fontSize: 12, color: '#ffffff' },
   actionBtn: {
     position: 'absolute',
-    top: 290,
+    top: 0,
     width: 40,
     height: 41,
     borderRadius: 20,
@@ -280,7 +305,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 54,
     left: 14,
-    width: 332,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -298,7 +322,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 98,
     left: 35,
-    width: 290,
     height: 87,
     flexDirection: 'row',
     alignItems: 'center',
@@ -328,7 +351,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 234,
     left: 14,
-    width: 332,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -347,7 +369,6 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 282,
     left: 17,
-    width: 326,
     height: 52,
     borderRadius: 100,
     backgroundColor: '#7048ca',
