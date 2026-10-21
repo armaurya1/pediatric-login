@@ -1,8 +1,10 @@
 import { useMemo, useRef, useState } from 'react';
 import {
   Alert,
+  FlatList,
   Image,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -83,7 +85,7 @@ const CATEGORIES: { label: string; image: number }[][] = [
   ],
 ];
 
-const FILTER_TABS = ['All', 'Antibiotics', 'Daily Essentials', 'Acidity & Gas', 'Antifungal'];
+const FILTER_TABS = ['Antibiotics', 'Daily Essentials', 'Acidity & Gas', 'Antifungal', 'All'];
 
 export default function MedicinesScreen({ onBack }: { onBack?: () => void }) {
   const insets = useSafeAreaInsets();
@@ -92,7 +94,7 @@ export default function MedicinesScreen({ onBack }: { onBack?: () => void }) {
   // Screen modes: 'home' | 'search'
   const [screenMode, setScreenMode] = useState<'home' | 'search'>('home');
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState('All');
+  const [selectedFilter, setSelectedFilter] = useState('Antibiotics');
   const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(null);
   const [cartQuantities, setCartQuantities] = useState<Record<number, number>>({});
 
@@ -162,11 +164,11 @@ export default function MedicinesScreen({ onBack }: { onBack?: () => void }) {
     );
   };
 
-  const openSearchScreen = () => {
+  const openSearchScreen = (category?: string) => {
+    if (category) {
+      setSelectedFilter(category);
+    }
     setScreenMode('search');
-    setTimeout(() => {
-      searchInputRef.current?.focus();
-    }, 100);
   };
 
   // Medicine Item Card in Search
@@ -288,6 +290,7 @@ export default function MedicinesScreen({ onBack }: { onBack?: () => void }) {
                 autoCorrect={false}
                 autoCapitalize="none"
                 returnKeyType="search"
+                autoFocus={true}
               />
               {searchQuery.length > 0 && (
                 <Pressable
@@ -344,27 +347,34 @@ export default function MedicinesScreen({ onBack }: { onBack?: () => void }) {
             </ScrollView>
           </View>
 
-          {/* Search Results List */}
-          <ScrollView
+          {/* Virtualized Search Results List - Fast 0ms render */}
+          <FlatList
+            data={filteredMedicines}
+            keyExtractor={(item) => item.id.toString()}
+            renderItem={({ item }) => renderMedicineCard(item)}
+            initialNumToRender={8}
+            maxToRenderPerBatch={8}
+            windowSize={5}
+            removeClippedSubviews={Platform.OS !== 'web'}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
             style={styles.searchResultsScroll}
             contentContainerStyle={[
               styles.searchResultsContent,
               totalCartCount > 0 && { paddingBottom: 100 },
             ]}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
-            <View style={styles.resultSummaryRow}>
-              <Text style={styles.resultCountText}>
-                {filteredMedicines.length}{' '}
-                {filteredMedicines.length === 1 ? 'medicine' : 'medicines'} found
-              </Text>
-              {selectedFilter !== 'All' && (
-                <Text style={styles.activeCategoryLabel}>in {selectedFilter}</Text>
-              )}
-            </View>
-
-            {filteredMedicines.length === 0 ? (
+            ListHeaderComponent={
+              <View style={styles.resultSummaryRow}>
+                <Text style={styles.resultCountText}>
+                  {filteredMedicines.length}{' '}
+                  {filteredMedicines.length === 1 ? 'medicine' : 'medicines'} found
+                </Text>
+                <Text style={styles.activeCategoryLabel}>
+                  {selectedFilter === 'All' ? 'All Medicines' : selectedFilter}
+                </Text>
+              </View>
+            }
+            ListEmptyComponent={
               <View style={styles.emptyContainer}>
                 <Text style={styles.emptyTitle}>No medicines found</Text>
                 <Text style={styles.emptySub}>
@@ -374,16 +384,14 @@ export default function MedicinesScreen({ onBack }: { onBack?: () => void }) {
                   style={styles.clearSearchBtn}
                   onPress={() => {
                     setSearchQuery('');
-                    setSelectedFilter('All');
+                    setSelectedFilter('Antibiotics');
                   }}
                 >
                   <Text style={styles.clearSearchBtnText}>Reset Search</Text>
                 </Pressable>
               </View>
-            ) : (
-              filteredMedicines.map(renderMedicineCard)
-            )}
-          </ScrollView>
+            }
+          />
         </View>
       ) : (
         /* ========================================================
@@ -431,7 +439,7 @@ export default function MedicinesScreen({ onBack }: { onBack?: () => void }) {
           {/* Search bar - Tapping opens the different Search Screen */}
           <Pressable
             style={styles.searchBar}
-            onPress={openSearchScreen}
+            onPress={() => openSearchScreen()}
             accessibilityRole="button"
             accessibilityLabel="Search medicines, wellness"
           >
@@ -451,7 +459,17 @@ export default function MedicinesScreen({ onBack }: { onBack?: () => void }) {
                 <Pressable
                   key={item.label}
                   style={styles.tile}
-                  onPress={openSearchScreen}
+                  onPress={() => {
+                    const l = item.label.toLowerCase();
+                    const cat = l.includes('other\nmedicines')
+                      ? 'Antibiotics'
+                      : l.includes('gut')
+                      ? 'Acidity & Gas'
+                      : l.includes('skin')
+                      ? 'Antifungal'
+                      : 'Daily Essentials';
+                    openSearchScreen(cat);
+                  }}
                 >
                   <Image source={item.image} style={styles.tileImage} resizeMode="cover" />
                   <Text style={styles.tileLabel}>{item.label}</Text>
