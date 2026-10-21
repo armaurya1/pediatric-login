@@ -378,9 +378,7 @@ export default function HomeScreen({ onOnlineConsult, onDoctorProfile }: Props) 
         </LinearGradient>
         <View
           style={[styles.gestureArea, { height: 16 + insets.bottom }]}
-        >
-          <View style={styles.homeIndicator} />
-        </View>
+        />
       </View>
     </View>
   );
@@ -757,13 +755,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
     marginTop: 8,
     alignItems: 'center',
-  },
-  homeIndicator: {
-    width: 122,
-    height: 4,
-    borderRadius: 4,
-    backgroundColor: '#858585',
-    marginTop: 5,
   },
 });
 
