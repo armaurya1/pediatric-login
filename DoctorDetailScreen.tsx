@@ -27,19 +27,23 @@ const STAR_LG_SVG = `<svg width="17" height="17" viewBox="0 0 17 17" fill="none"
 const CLOCK_ACTIVE_SVG = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_0_17)"><path d="M6 2.99976V6L8.00016 7.00008M11.0004 6C11.0004 8.76164 8.76164 11.0004 6 11.0004C3.23836 11.0004 0.9996 8.76164 0.9996 6C0.9996 3.23836 3.23836 0.9996 6 0.9996C8.76164 0.9996 11.0004 3.23836 11.0004 6Z" stroke-width="1.6" stroke-linecap="round" stroke="#8055BD"/></g><defs><clipPath><rect width="12" height="12" fill="white"/></clipPath></defs></svg>`;
 const CLOCK_SVG = `<svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><g clip-path="url(#clip0_0_7)"><path d="M6 2.99976V6L8.00016 7.00008M11.0004 6C11.0004 8.76164 8.76164 11.0004 6 11.0004C3.23836 11.0004 0.9996 8.76164 0.9996 6C0.9996 3.23836 3.23836 0.9996 6 0.9996C8.76164 0.9996 11.0004 3.23836 11.0004 6Z" stroke-width="1.6" stroke-linecap="round" stroke="#554353"/></g><defs><clipPath><rect width="12" height="12" fill="white"/></clipPath></defs></svg>`;
 
-const MONTHS = ['October', 'November', 'December', 'January', 'February'];
-// The day picker is drawn as a perspective fan in Figma: chip and font sizes
-// grow toward the selected day in the center.
-const DAYS = [
-  { day: '2', dow: 'Sun', w: 21, h: 31, num: 9, dowSize: 5.58 },
-  { day: '3', dow: 'Mon', w: 33, h: 42, num: 12, dowSize: 7.44 },
-  { day: '4', dow: 'Tue', w: 34, h: 50, num: 14, dowSize: 8.68 },
-  { day: '5', dow: 'Wed', w: 54, h: 68, num: 18, dowSize: 10 },
-  { day: '6', dow: 'Thu', w: 34, h: 50, num: 14, dowSize: 8.68 },
-  { day: '7', dow: 'Fri', w: 33, h: 42, num: 12, dowSize: 7.44 },
-  { day: '8', dow: 'Sat', w: 21, h: 31, num: 9, dowSize: 5.58 },
+const MONTH_NAMES = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
 ];
-const TIMES = ['10:30 AM', '11:00 AM', '12:00 PM', '01:00 PM'];
+const MONTHS = Array.from({ length: 12 }, (_, index) => {
+  const date = new Date(new Date().getFullYear(), 9 + index, 1);
+  return {
+    key: `${date.getFullYear()}-${date.getMonth()}`,
+    label: MONTH_NAMES[date.getMonth()],
+    year: date.getFullYear(),
+    monthIndex: date.getMonth(),
+  };
+});
+const TIMES = [
+  '10:30 AM', '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM',
+  '01:00 PM', '01:30 PM', '02:00 PM', '02:30 PM', '03:00 PM',
+];
 const STATS = [
   { icon: HISTORY_SVG, value: '8 years', label: 'Experience' },
   { icon: USERS_SVG, value: '2.7K+', label: 'Patients' },
@@ -51,9 +55,22 @@ export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
   const [fontsLoaded] = useFonts({ Roboto_400Regular, Roboto_500Medium });
   const [month, setMonth] = useState(1);
-  const [day, setDay] = useState(3);
+  const [day, setDay] = useState(5);
   const [time, setTime] = useState(0);
   if (!fontsLoaded) return null;
+
+  const selectedMonth = MONTHS[month];
+  const daysInMonth = new Date(
+    selectedMonth.year,
+    selectedMonth.monthIndex + 1,
+    0,
+  ).getDate();
+  const selectMonth = (nextMonth: number) => {
+    const next = MONTHS[nextMonth];
+    const lastDay = new Date(next.year, next.monthIndex + 1, 0).getDate();
+    setMonth(nextMonth);
+    setDay((currentDay) => Math.min(currentDay, lastDay));
+  };
 
   const profileCardHeight = Math.max(
     401,
@@ -94,7 +111,7 @@ export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
           <View style={[styles.navBtn, styles.heartBtn, { top: navTop }]}>
             <SvgXml xml={HEART_SVG} width={17} height={17} />
           </View>
-          <Text style={[styles.name, { top: portraitHeight - 74 }]}>Rohan Sharma</Text>
+          <Text style={[styles.name, { top: portraitHeight - 74 }]}>A. R. Maurya</Text>
           <View style={[styles.specialtyRow, { top: portraitHeight - 46 }]}>
             <Text style={styles.specialty}>Neurologist</Text>
             <View style={styles.rating}>
@@ -131,57 +148,79 @@ export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
       {/* Booking */}
       <View style={[styles.booking, { height: Math.max(363, windowHeight - profileCardHeight) }]}>
         <Text style={[styles.heading, { top: 24 }]}>Select Date</Text>
-        <View style={[styles.monthRow, { width: windowWidth - 28 }]}>
+        <ScrollView
+          horizontal
+          style={[styles.monthRow, { width: windowWidth - 28 }]}
+          contentContainerStyle={styles.monthRowContent}
+          showsHorizontalScrollIndicator={false}
+          decelerationRate="fast"
+          snapToInterval={66}
+          snapToAlignment="start"
+          nestedScrollEnabled
+        >
           {MONTHS.map((m, i) => (
             <Pressable
-              key={m}
+              key={m.key}
               style={[styles.monthChip, i === month && styles.monthChipActive]}
-              onPress={() => setMonth(i)}
+              onPress={() => selectMonth(i)}
             >
-              <Text style={styles.monthText}>{m}</Text>
+              <Text style={styles.monthText}>{m.label}</Text>
             </Pressable>
           ))}
-        </View>
+        </ScrollView>
 
-        <View style={[styles.dayRow, { width: windowWidth - 70 }]}>
-          {DAYS.map((d, i) => {
-            const active = i === day;
+        <ScrollView
+          key={selectedMonth.key}
+          horizontal
+          style={[styles.dayRow, { width: windowWidth - 70 }]}
+          contentContainerStyle={styles.dayRowContent}
+          contentOffset={{ x: Math.max(0, (day - 4) * 44), y: 0 }}
+          showsHorizontalScrollIndicator={false}
+          decelerationRate="fast"
+          snapToInterval={44}
+          snapToAlignment="start"
+          nestedScrollEnabled
+        >
+          {Array.from({ length: daysInMonth }, (_, index) => {
+            const dateNumber = index + 1;
+            const date = new Date(selectedMonth.year, selectedMonth.monthIndex, dateNumber);
+            const active = dateNumber === day;
             return (
-              <Pressable key={d.day} style={styles.dayOption} onPress={() => setDay(i)}>
+              <Pressable
+                key={dateNumber}
+                style={styles.dayOption}
+                onPress={() => setDay(dateNumber)}
+              >
                 <View
                   style={[
                     styles.dayChip,
-                    { width: d.w, height: d.h },
                     active && styles.dayChipActive,
                   ]}
                 >
-                  <Text
-                    style={[
-                      styles.dayNum,
-                      { fontSize: d.num },
-                      active && styles.dayTextActive,
-                    ]}
-                  >
-                    {d.day}
+                  <Text style={[styles.dayNum, active && styles.dayTextActive]}>
+                    {dateNumber}
                   </Text>
-                  <Text
-                    style={[
-                      styles.dayDow,
-                      { fontSize: d.dowSize },
-                      active && styles.dayTextActive,
-                    ]}
-                  >
-                    {d.dow}
+                  <Text style={[styles.dayDow, active && styles.dayTextActive]}>
+                    {date.toLocaleDateString('en-US', { weekday: 'short' })}
                   </Text>
                 </View>
                 {active && <View style={styles.dayDot} />}
               </Pressable>
             );
           })}
-        </View>
+        </ScrollView>
 
         <Text style={[styles.heading, { top: 205 }]}>Select Time</Text>
-        <View style={[styles.timeRow, { width: windowWidth - 28 }]}>
+        <ScrollView
+          horizontal
+          style={[styles.timeRow, { width: windowWidth - 28 }]}
+          contentContainerStyle={styles.timeRowContent}
+          showsHorizontalScrollIndicator={false}
+          decelerationRate="fast"
+          snapToInterval={106}
+          snapToAlignment="start"
+          nestedScrollEnabled
+        >
           {TIMES.map((t, i) => {
             const active = i === time;
             return (
@@ -195,10 +234,10 @@ export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
               </Pressable>
             );
           })}
-        </View>
+        </ScrollView>
 
         <Pressable style={[styles.bookBtn, { width: windowWidth - 34 }]}>
-          <Text style={styles.bookText}>Book Appointment - $15/hr</Text>
+          <Text style={styles.bookText}>Book Appointment - ₹500/hr</Text>
         </Pressable>
       </View>
     </ScrollView>
@@ -305,39 +344,57 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 54,
     left: 14,
+  },
+  monthRowContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    paddingRight: 14,
   },
   monthChip: {
+    width: 64,
     height: 31,
     borderRadius: 100,
-    paddingHorizontal: 6,
+    marginRight: 2,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  monthChipActive: { backgroundColor: '#e8dafc', paddingHorizontal: 7 },
+  monthChipActive: { backgroundColor: '#e8dafc' },
   monthText: { fontFamily: 'Roboto_400Regular', fontSize: 10.5, color: '#433b44' },
   dayRow: {
     position: 'absolute',
     top: 98,
     left: 35,
     height: 87,
+  },
+  dayRowContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    paddingRight: 8,
   },
-  dayOption: { height: 82, alignItems: 'center', justifyContent: 'center' },
+  dayOption: {
+    width: 44,
+    height: 82,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   dayChip: {
+    width: 38,
+    height: 54,
     backgroundColor: '#eaeaea',
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 5,
+    gap: 4,
   },
-  dayChipActive: { backgroundColor: '#5937a0', borderWidth: 3, borderColor: '#dccbf5', gap: 7 },
-  dayNum: { fontFamily: 'Roboto_500Medium', color: '#4b4b4b' },
-  dayDow: { fontFamily: 'Roboto_400Regular', color: '#665f68' },
+  dayChipActive: {
+    height: 68,
+    backgroundColor: '#5937a0',
+    borderWidth: 3,
+    borderColor: '#dccbf5',
+    gap: 6,
+  },
+  dayNum: { fontFamily: 'Roboto_500Medium', fontSize: 14, color: '#4b4b4b' },
+  dayDow: { fontFamily: 'Roboto_400Regular', fontSize: 8.5, color: '#665f68' },
   dayTextActive: { color: '#ffffff' },
   dayDot: {
     position: 'absolute',
@@ -351,14 +408,18 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 234,
     left: 14,
+  },
+  timeRowContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    paddingRight: 14,
   },
   timeChip: {
+    width: 98,
     height: 31,
+    marginRight: 8,
     borderRadius: 100,
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
