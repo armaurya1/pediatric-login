@@ -46,7 +46,10 @@ const TIMES = [
   '10:30 AM', '11:00 AM', '11:30 AM', '12:00 PM', '12:30 PM',
   '01:00 PM', '01:30 PM', '02:00 PM', '02:30 PM', '03:00 PM',
 ];
-const DATE_ITEM_WIDTH = 44;
+const DATE_ITEM_WIDTH = 50;
+const DATE_CARD_WIDTH = 58;
+const DATE_CARD_HEIGHT = 72;
+const DATE_PICKER_GAPS = [146.2, 105.5, 58.6, 0, -58.6, -105.5, -146.2];
 const STATS = [
   { icon: HISTORY_SVG, value: '8 years', label: 'Experience' },
   { icon: USERS_SVG, value: '2.7K+', label: 'Patients' },
@@ -98,6 +101,8 @@ export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
     401,
     Math.min(441, windowHeight * 0.55),
   );
+  const dayRowWidth = Math.min(316, windowWidth - 24);
+  const dayRowLeft = (windowWidth - dayRowWidth) / 2;
   const portraitHeight = profileCardHeight - 84;
   const navTop = Math.max(insets.top + 12, 24);
 
@@ -195,10 +200,10 @@ export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
           ref={dayScrollRef}
           key={selectedMonth.key}
           horizontal
-          style={[styles.dayRow, { width: windowWidth - 70 }]}
+          style={[styles.dayRow, { width: dayRowWidth, left: dayRowLeft }]}
           contentContainerStyle={[
             styles.dayRowContent,
-            { paddingHorizontal: Math.max(0, (windowWidth - 70 - DATE_ITEM_WIDTH) / 2) },
+            { paddingHorizontal: Math.max(0, (dayRowWidth - DATE_ITEM_WIDTH) / 2) },
           ]}
           contentOffset={{ x: (day - 1) * DATE_ITEM_WIDTH, y: 0 }}
           showsHorizontalScrollIndicator={false}
@@ -223,41 +228,62 @@ export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
             const date = new Date(selectedMonth.year, selectedMonth.monthIndex, dateNumber);
             const active = dateNumber === day;
             const itemCenterOffset = (dateNumber - 1) * DATE_ITEM_WIDTH;
-            const scale = scrollX.interpolate({
-              inputRange: [
-                itemCenterOffset - DATE_ITEM_WIDTH * 3,
-                itemCenterOffset - DATE_ITEM_WIDTH * 2,
-                itemCenterOffset - DATE_ITEM_WIDTH,
-                itemCenterOffset,
-                itemCenterOffset + DATE_ITEM_WIDTH,
-                itemCenterOffset + DATE_ITEM_WIDTH * 2,
-                itemCenterOffset + DATE_ITEM_WIDTH * 3,
-              ],
-              outputRange: [0.4, 0.62, 0.74, 1, 0.74, 0.62, 0.4],
+            const inputRange = [
+              itemCenterOffset - DATE_ITEM_WIDTH * 3,
+              itemCenterOffset - DATE_ITEM_WIDTH * 2,
+              itemCenterOffset - DATE_ITEM_WIDTH,
+              itemCenterOffset,
+              itemCenterOffset + DATE_ITEM_WIDTH,
+              itemCenterOffset + DATE_ITEM_WIDTH * 2,
+              itemCenterOffset + DATE_ITEM_WIDTH * 3,
+            ];
+            const translateX = scrollX.interpolate({
+              inputRange,
+              outputRange: DATE_PICKER_GAPS.map(
+                (centerOffset, distance) =>
+                  centerOffset - (3 - distance) * DATE_ITEM_WIDTH,
+              ),
+              extrapolate: 'clamp',
+            });
+            const scaleX = scrollX.interpolate({
+              inputRange,
+              outputRange: [0.39, 0.61, 0.63, 1, 0.63, 0.61, 0.39],
+              extrapolate: 'clamp',
+            });
+            const scaleY = scrollX.interpolate({
+              inputRange,
+              outputRange: [0.456, 0.618, 0.735, 1, 0.735, 0.618, 0.456],
               extrapolate: 'clamp',
             });
             return (
-              <Pressable
+              <Animated.View
                 key={dateNumber}
-                style={styles.dayOption}
-                onPress={() => selectDay(dateNumber)}
+                style={[
+                  styles.dayOption,
+                  { transform: [{ translateX }] },
+                ]}
               >
-                <Animated.View
-                  style={[
-                    styles.dayChip,
-                    active && styles.dayChipActive,
-                    { transform: [{ scale }] },
-                  ]}
+                <Pressable
+                  style={styles.dayOptionPressable}
+                  onPress={() => selectDay(dateNumber)}
                 >
-                  <Text style={[styles.dayNum, active && styles.dayTextActive]}>
-                    {dateNumber}
-                  </Text>
-                  <Text style={[styles.dayDow, active && styles.dayTextActive]}>
-                    {date.toLocaleDateString('en-US', { weekday: 'short' })}
-                  </Text>
-                </Animated.View>
-                {active && <View style={styles.dayDot} />}
-              </Pressable>
+                  <Animated.View
+                    style={[
+                      styles.dayChip,
+                      active && styles.dayChipActive,
+                      { transform: [{ scaleX }, { scaleY }] },
+                    ]}
+                  >
+                    <Text style={[styles.dayNum, active && styles.dayTextActive]}>
+                      {dateNumber}
+                    </Text>
+                    <Text style={[styles.dayDow, active && styles.dayTextActive]}>
+                      {date.toLocaleDateString('en-US', { weekday: 'short' })}
+                    </Text>
+                  </Animated.View>
+                  {active && <View style={styles.dayDot} />}
+                </Pressable>
+              </Animated.View>
             );
           })}
         </Animated.ScrollView>
@@ -265,7 +291,9 @@ export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
           pointerEvents="none"
           style={[
             styles.daySelectionMarker,
-            { left: 35 + (windowWidth - 70 - 54) / 2 },
+            {
+              left: dayRowLeft + (dayRowWidth - DATE_CARD_WIDTH) / 2,
+            },
           ]}
         />
 
@@ -422,22 +450,27 @@ const styles = StyleSheet.create({
   dayRow: {
     position: 'absolute',
     top: 98,
-    left: 35,
-    height: 87,
+    height: 91,
   },
   dayRowContent: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   dayOption: {
-    width: 44,
+    width: DATE_ITEM_WIDTH,
     height: 82,
     alignItems: 'center',
     justifyContent: 'center',
   },
+  dayOptionPressable: {
+    width: '100%',
+    height: '100%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   dayChip: {
-    width: 54,
-    height: 68,
+    width: DATE_CARD_WIDTH,
+    height: DATE_CARD_HEIGHT,
     backgroundColor: '#eaeaea',
     borderRadius: 12,
     alignItems: 'center',
@@ -446,6 +479,7 @@ const styles = StyleSheet.create({
   },
   dayChipActive: {
     backgroundColor: '#5937a0',
+    borderRadius: 18,
     borderWidth: 3,
     borderColor: '#dccbf5',
   },
@@ -455,18 +489,18 @@ const styles = StyleSheet.create({
   daySelectionMarker: {
     position: 'absolute',
     top: 107.5,
-    width: 54,
-    height: 68,
-    borderRadius: 12,
+    width: DATE_CARD_WIDTH,
+    height: DATE_CARD_HEIGHT,
+    borderRadius: 18,
     borderWidth: 3,
     borderColor: '#dccbf5',
   },
   dayDot: {
     position: 'absolute',
-    bottom: 0,
-    width: 5.5,
-    height: 5.5,
-    borderRadius: 3,
+    top: 79,
+    width: 7,
+    height: 7,
+    borderRadius: 4,
     backgroundColor: '#5937a0',
   },
   timeRow: {
