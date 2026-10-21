@@ -80,9 +80,10 @@ type TabKey = (typeof TABS)[number]['key'];
 
 type Props = {
   onOnlineConsult: () => void;
+  onDoctorProfile: () => void;
 };
 
-export default function HomeScreen({ onOnlineConsult }: Props) {
+export default function HomeScreen({ onOnlineConsult, onDoctorProfile }: Props) {
   const insets = useSafeAreaInsets();
   const { width: windowWidth } = useWindowDimensions();
   const [activeTab, setActiveTab] = useState<TabKey>('home');
@@ -215,7 +216,12 @@ export default function HomeScreen({ onOnlineConsult }: Props) {
         <View style={styles.recentSection}>
           <Text style={styles.sectionHeading}>Recently Viewed</Text>
 
-          <View style={styles.recentCard}>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Open general physician profile"
+            onPress={onDoctorProfile}
+            style={styles.recentCard}
+          >
             <Image
               source={require('./assets/images/home/physician.png')}
               style={styles.physicianIcon}
@@ -223,7 +229,7 @@ export default function HomeScreen({ onOnlineConsult }: Props) {
             />
             <Text style={styles.recentSpecialty}>General physician</Text>
             <Text style={styles.recentChannel}>in Video Consult</Text>
-          </View>
+          </Pressable>
 
           <ScrollView
             accessibilityLabel="Home promotions"
@@ -706,7 +712,7 @@ const styles = StyleSheet.create({
     overflow: 'hidden',
   },
   footerImage: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     width: '100%',
     height: '100%',
   },

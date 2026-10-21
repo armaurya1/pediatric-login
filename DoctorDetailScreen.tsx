@@ -51,7 +51,7 @@ export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
       <View style={styles.profileCard}>
         <View style={styles.portrait}>
           <Image
-            source={require('./assets/images/doctor/doctor-photo.jpg')}
+            source={require('./assets/images/doctor/doctor-photo.png')}
             style={styles.photo}
             resizeMode="cover"
           />
@@ -356,3 +356,5 @@ const styles = StyleSheet.create({
   },
   bookText: { fontFamily: 'Roboto_500Medium', fontSize: 14, color: '#ffffff' },
 });
+
+

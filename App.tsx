@@ -25,6 +25,7 @@ import {
 import VerificationScreen from './VerificationScreen';
 import HomeScreen from './HomeScreen';
 import ConsultScreen from './ConsultScreen';
+import DoctorDetailScreen from './DoctorDetailScreen';
 
 // SVG icons downloaded fresh from Figma (file q4OVzpZDgUgZoTikqnYWoh, node 2:84)
 const ICONS = {
@@ -52,7 +53,7 @@ const ICONS = {
 
 export default function App() {
   const [screen, setScreen] = useState<
-    'login' | 'verification' | 'home' | 'consult'
+    'login' | 'verification' | 'home' | 'consult' | 'doctor'
   >('login');
   return (
     <SafeAreaProvider>
@@ -62,8 +63,13 @@ export default function App() {
         <VerificationScreen onVerify={() => setScreen('home')} />
       ) : screen === 'consult' ? (
         <ConsultScreen onBack={() => setScreen('home')} />
+      ) : screen === 'doctor' ? (
+        <DoctorDetailScreen onBack={() => setScreen('home')} />
       ) : (
-        <HomeScreen onOnlineConsult={() => setScreen('consult')} />
+        <HomeScreen
+          onOnlineConsult={() => setScreen('consult')}
+          onDoctorProfile={() => setScreen('doctor')}
+        />
       )}
     </SafeAreaProvider>
   );
@@ -249,3 +255,4 @@ const styles = StyleSheet.create({
     color: '#737581',
   },
 });
+
