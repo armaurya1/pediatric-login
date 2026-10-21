@@ -78,11 +78,22 @@ const TABS = [
 
 type TabKey = (typeof TABS)[number]['key'];
 
+export type RecentItem = {
+  id: string;
+  name: string;
+};
+
+const DEFAULT_RECENT: RecentItem[] = [
+  { id: 'dermatology', name: 'Dermatology' },
+  { id: 'general-physician', name: 'General physician' },
+];
+
 type Props = {
   onOnlineConsult: () => void;
-  onDoctorProfile: () => void;
+  onDoctorProfile: (specialtyName?: string) => void;
   onMedicines?: () => void;
   onLabTests?: () => void;
+  recentlyViewed?: RecentItem[];
 };
 
 export default function HomeScreen({
@@ -90,6 +101,7 @@ export default function HomeScreen({
   onDoctorProfile,
   onMedicines,
   onLabTests,
+  recentlyViewed = DEFAULT_RECENT,
 }: Props) {
   const insets = useSafeAreaInsets();
   const { width: windowWidth } = useWindowDimensions();
@@ -247,20 +259,37 @@ export default function HomeScreen({
         <View style={styles.recentSection}>
           <Text style={styles.sectionHeading}>Recently Viewed</Text>
 
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Open general physician profile"
-            onPress={onDoctorProfile}
-            style={styles.recentCard}
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={styles.recentCardsScroll}
+            style={styles.recentCardsRow}
           >
-            <Image
-              source={require('./assets/images/home/physician.png')}
-              style={styles.physicianIcon}
-              resizeMode="cover"
-            />
-            <Text style={styles.recentSpecialty}>General physician</Text>
-            <Text style={styles.recentChannel}>in Video Consult</Text>
-          </Pressable>
+            {recentlyViewed.map((item) => (
+              <Pressable
+                key={item.id}
+                accessibilityRole="button"
+                accessibilityLabel={`Open ${item.name} in Video Consult`}
+                onPress={() => onDoctorProfile(item.name)}
+                style={({ pressed }) => [
+                  styles.recentCard,
+                  pressed && { opacity: 0.85, transform: [{ scale: 0.97 }] },
+                ]}
+              >
+                <Image
+                  source={require('./assets/images/home/physician.png')}
+                  style={styles.physicianIcon}
+                  resizeMode="cover"
+                />
+                <Text style={styles.recentSpecialty} numberOfLines={1}>
+                  {item.name}
+                </Text>
+                <Text style={styles.recentChannel} numberOfLines={1}>
+                  in Video Consult
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
 
           <ScrollView
             accessibilityLabel="Home promotions"
@@ -556,12 +585,24 @@ const styles = StyleSheet.create({
     fontSize: 19,
     color: '#160b37',
   },
+  recentCardsRow: {
+    marginTop: 11,
+    marginHorizontal: -8,
+  },
+  recentCardsScroll: {
+    paddingHorizontal: 8,
+    gap: 12,
+  },
   recentCard: {
-    width: 134,
+    width: 140,
     height: 82,
     backgroundColor: '#ffffff',
     borderRadius: 16,
-    marginTop: 11,
+    shadowColor: 'rgba(22, 11, 55, 0.08)',
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 6,
+    shadowOpacity: 1,
+    elevation: 3,
   },
   physicianIcon: { width: 37, height: 30, marginLeft: 16, marginTop: 8 },
   recentSpecialty: {
@@ -569,6 +610,7 @@ const styles = StyleSheet.create({
     fontSize: 12.5,
     color: '#160b37',
     marginLeft: 16,
+    marginRight: 8,
     marginTop: 4,
   },
   recentChannel: {
@@ -576,6 +618,7 @@ const styles = StyleSheet.create({
     fontSize: 12.5,
     color: '#160b37',
     marginLeft: 16,
+    marginRight: 8,
     marginTop: 1,
   },
   promoCarousel: { height: 109, marginTop: 29, marginHorizontal: -8 },

@@ -134,7 +134,7 @@ export default function ConsultScreen({
   onSelectDoctor,
 }: {
   onBack: () => void;
-  onSelectDoctor?: () => void;
+  onSelectDoctor?: (specialtyName: string) => void;
 }) {
   const insets = useSafeAreaInsets();
   const inputRef = useRef<any>(null);
@@ -263,34 +263,27 @@ export default function ConsultScreen({
                 key={i}
                 style={[styles.tileRow, i > 0 && styles.tileRowGap]}
               >
-                {row.map((item) => {
-                  const isTargetDoctor =
-                    item.label.includes('General') ||
-                    item.label.includes('Women') ||
-                    item.label.includes('Dermatology');
-
-                  return (
-                    <Pressable
-                      key={item.label}
-                      style={({ pressed }) => [
-                        styles.tile,
-                        isTargetDoctor && pressed && { opacity: 0.75, transform: [{ scale: 0.96 }] },
-                      ]}
-                      onPress={isTargetDoctor ? onSelectDoctor : undefined}
-                      accessibilityRole={isTargetDoctor ? 'button' : undefined}
-                      accessibilityLabel={item.label.replace('\n', ' ')}
-                    >
-                      <View style={styles.tileCard}>
-                        <Image
-                          source={item.image}
-                          style={styles.tileImage}
-                          resizeMode="cover"
-                        />
-                      </View>
-                      <Text style={styles.tileLabel}>{item.label}</Text>
-                    </Pressable>
-                  );
-                })}
+                {row.map((item) => (
+                  <Pressable
+                    key={item.label}
+                    style={({ pressed }) => [
+                      styles.tile,
+                      pressed && { opacity: 0.75, transform: [{ scale: 0.96 }] },
+                    ]}
+                    onPress={() => onSelectDoctor?.(item.name)}
+                    accessibilityRole="button"
+                    accessibilityLabel={item.label.replace('\n', ' ')}
+                  >
+                    <View style={styles.tileCard}>
+                      <Image
+                        source={item.image}
+                        style={styles.tileImage}
+                        resizeMode="cover"
+                      />
+                    </View>
+                    <Text style={styles.tileLabel}>{item.label}</Text>
+                  </Pressable>
+                ))}
               </View>
             ))
           )}

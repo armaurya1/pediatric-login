@@ -56,7 +56,13 @@ const STATS = [
 ];
 const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
+export default function DoctorDetailScreen({
+  onBack,
+  specialty,
+}: {
+  onBack: () => void;
+  specialty?: string;
+}) {
   const insets = useSafeAreaInsets();
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
   const [month, setMonth] = useState(1);
@@ -138,7 +144,7 @@ export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
           </View>
           <Text style={[styles.name, { top: portraitHeight - 74 }]}>A. R. Maurya</Text>
           <View style={[styles.specialtyRow, { top: portraitHeight - 46 }]}>
-            <Text style={styles.specialty}>Neurologist</Text>
+            <Text style={styles.specialty}>{specialty || 'General Practitioner'}</Text>
             <View style={styles.rating}>
               <SvgXml xml={STAR_SM_SVG} width={13} height={13} />
               <Text style={styles.ratingText}>4.8</Text>

@@ -29,7 +29,7 @@ import {
   Roboto_700Bold,
 } from '@expo-google-fonts/roboto';
 import VerificationScreen from './VerificationScreen';
-import HomeScreen from './HomeScreen';
+import HomeScreen, { RecentItem } from './HomeScreen';
 import ConsultScreen from './ConsultScreen';
 import DoctorDetailScreen from './DoctorDetailScreen';
 import MedicinesScreen from './MedicinesScreen';
@@ -72,6 +72,29 @@ export default function App() {
     'login' | 'verification' | 'home' | 'consult' | 'doctor' | 'medicines' | 'labTests'
   >('login');
   const [doctorFrom, setDoctorFrom] = useState<'home' | 'consult'>('home');
+  const [recentlyViewed, setRecentlyViewed] = useState<RecentItem[]>([
+    { id: 'dermatology', name: 'Dermatology' },
+    { id: 'general-physician', name: 'General physician' },
+  ]);
+  const [selectedDoctorSpecialty, setSelectedDoctorSpecialty] = useState<string>('Dermatology');
+
+  const handleSelectDoctor = (specialtyName: string) => {
+    setRecentlyViewed((prev) => {
+      const filtered = prev.filter(
+        (item) => item.name.toLowerCase() !== specialtyName.toLowerCase(),
+      );
+      return [
+        {
+          id: specialtyName.toLowerCase().replace(/\s+/g, '-'),
+          name: specialtyName,
+        },
+        ...filtered,
+      ];
+    });
+    setSelectedDoctorSpecialty(specialtyName);
+    setDoctorFrom('consult');
+    setScreen('doctor');
+  };
 
   if (!fontsLoaded) {
     return null;
@@ -86,13 +109,13 @@ export default function App() {
       ) : screen === 'consult' ? (
         <ConsultScreen
           onBack={() => setScreen('home')}
-          onSelectDoctor={() => {
-            setDoctorFrom('consult');
-            setScreen('doctor');
-          }}
+          onSelectDoctor={handleSelectDoctor}
         />
       ) : screen === 'doctor' ? (
-        <DoctorDetailScreen onBack={() => setScreen(doctorFrom)} />
+        <DoctorDetailScreen
+          onBack={() => setScreen(doctorFrom)}
+          specialty={selectedDoctorSpecialty}
+        />
       ) : screen === 'medicines' ? (
         <MedicinesScreen onBack={() => setScreen('home')} />
       ) : screen === 'labTests' ? (
@@ -100,12 +123,16 @@ export default function App() {
       ) : (
         <HomeScreen
           onOnlineConsult={() => setScreen('consult')}
-          onDoctorProfile={() => {
+          onDoctorProfile={(specialtyName?: string) => {
+            if (specialtyName) {
+              setSelectedDoctorSpecialty(specialtyName);
+            }
             setDoctorFrom('home');
             setScreen('doctor');
           }}
           onMedicines={() => setScreen('medicines')}
           onLabTests={() => setScreen('labTests')}
+          recentlyViewed={recentlyViewed}
         />
       )}
     </SafeAreaProvider>
