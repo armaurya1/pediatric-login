@@ -398,6 +398,9 @@ export default function HomeScreen({
               style={styles.footerImage}
               resizeMode="cover"
             />
+            <View style={styles.hospitalTextWrap}>
+              <Text style={styles.hospitalText}>Maa Shakti Hospital</Text>
+            </View>
           </View>
         </View>
       </ScrollView>
@@ -787,6 +790,22 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFill,
     width: '100%',
     height: '100%',
+  },
+  hospitalTextWrap: {
+    position: 'absolute',
+    top: '19%',
+    left: 20,
+    maxWidth: 220,
+  },
+  hospitalText: {
+    fontFamily: 'Roboto_700Bold',
+    fontWeight: 'bold',
+    fontSize: 16,
+    color: '#6b52ae',
+    letterSpacing: 0.3,
+    textShadowColor: 'rgba(255, 255, 255, 0.85)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 3,
   },
   navWrap: { position: 'absolute', left: 0, right: 0 },
   navBar: {
