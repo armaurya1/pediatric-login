@@ -15,7 +15,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SvgXml } from 'react-native-svg';
 import { ALL_MEDICINES, Medicine } from './medicinesData';
 
-// Icons: Figma SVGs (node 160:233) & helpers
+// Icons: the screen's own Figma SVGs (node 160:233)
 const BACK_SVG = `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M19 12H5M12 19L5 12L12 5" stroke="#19112C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
@@ -34,10 +34,6 @@ const PLUS_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" xm
 <path d="M12 5V19M5 12H19" stroke="#6b52ae" stroke-width="2.5" stroke-linecap="round"/>
 </svg>`;
 
-const CHECK_SVG = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M20 6L9 17L4 12" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>`;
-
 const CLOSE_SVG = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <path d="M18 6L6 18M6 6L18 18" stroke="#19112C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
@@ -53,7 +49,7 @@ const TRUCK_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" x
 <circle cx="18.5" cy="18.5" r="2.5" stroke="#6b52ae" stroke-width="2"/>
 </svg>`;
 
-// Category product photos
+// Category product photos: Figma 4x exports (312x316 for a 78x79 display).
 const CATEGORIES: { label: string; image: number }[][] = [
   [
     { label: 'Vitamins &\nSupplements', image: require('./assets/images/medicines/med-vitamins.png') },
@@ -100,7 +96,7 @@ export default function MedicinesScreen({ onBack }: { onBack?: () => void }) {
   const [selectedMedicine, setSelectedMedicine] = useState<Medicine | null>(null);
   const [cartQuantities, setCartQuantities] = useState<Record<number, number>>({});
 
-  // Filtered medicines based on search and selected category
+  // Filtered medicines for the search screen
   const filteredMedicines = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
     return ALL_MEDICINES.filter((m) => {
@@ -115,11 +111,6 @@ export default function MedicinesScreen({ onBack }: { onBack?: () => void }) {
       );
     });
   }, [searchQuery, selectedFilter]);
-
-  // Featured medicines for main screen showcase (first 8 popular items)
-  const featuredMedicines = useMemo(() => {
-    return ALL_MEDICINES.slice(0, 8);
-  }, []);
 
   // Cart totals
   const totalCartCount = useMemo(() => {
@@ -178,7 +169,7 @@ export default function MedicinesScreen({ onBack }: { onBack?: () => void }) {
     }, 100);
   };
 
-  // Medicine Item Card in Search / List
+  // Medicine Item Card in Search
   const renderMedicineCard = (m: Medicine) => {
     const qty = cartQuantities[m.id] || 0;
     return (
@@ -267,7 +258,7 @@ export default function MedicinesScreen({ onBack }: { onBack?: () => void }) {
       <StatusBar style="dark" />
 
       {/* ========================================================
-          MODE 1: SEARCH SCREEN (Second Screen with Search Bar)
+          MODE 1: SEARCH SCREEN (Separate Screen for 100 Medicines)
          ======================================================== */}
       {screenMode === 'search' ? (
         <View style={styles.searchScreenRoot}>
@@ -396,7 +387,7 @@ export default function MedicinesScreen({ onBack }: { onBack?: () => void }) {
         </View>
       ) : (
         /* ========================================================
-            MODE 2: MAIN MEDICINES HOME SCREEN
+            MODE 2: CLEAN MEDICINE HOME SCREEN (Popular Categories)
            ======================================================== */
         <ScrollView
           showsVerticalScrollIndicator={false}
@@ -437,47 +428,23 @@ export default function MedicinesScreen({ onBack }: { onBack?: () => void }) {
             </Pressable>
           </View>
 
-          {/* Search Bar - Tapping transitions to Second Search Screen */}
+          {/* Search bar - Tapping opens the different Search Screen */}
           <Pressable
             style={styles.searchBar}
             onPress={openSearchScreen}
             accessibilityRole="button"
-            accessibilityLabel="Search 100+ medicines"
+            accessibilityLabel="Search medicines, wellness"
           >
             <SvgXml xml={SEARCH_SVG} width={17} height={18} />
-            <Text style={styles.searchPlaceholder}>
-              Search 100+ medicines, e.g. Dolo, Azithral...
+            <Text style={styles.searchInputPlaceholder}>
+              Search medicines, wellness...
             </Text>
           </Pressable>
 
-          {/* Order Medicines Section (100 Medicines from Excel Sheet) */}
-          <View style={styles.orderMedicinesSection}>
-            <View style={styles.sectionHeaderRow}>
-              <View>
-                <Text style={styles.heading}>Order Medicines</Text>
-                <Text style={styles.subheading}>
-                  100+ Verified medicines with instant delivery
-                </Text>
-              </View>
-              <Pressable onPress={openSearchScreen}>
-                <Text style={styles.viewAllText}>View all 100 ›</Text>
-              </Pressable>
-            </View>
-
-            <View style={styles.medicineCardList}>
-              {featuredMedicines.map(renderMedicineCard)}
-            </View>
-
-            <Pressable style={styles.viewAllFullBtn} onPress={openSearchScreen}>
-              <Text style={styles.viewAllFullBtnText}>
-                Search All 100 Medicines in Catalog
-              </Text>
-            </Pressable>
-          </View>
-
-          {/* Popular categories (20 Categories) */}
+          {/* Popular categories heading */}
           <Text style={styles.heading}>Popular categories</Text>
 
+          {/* 20 Popular category tiles (Exact same clean design as before) */}
           {CATEGORIES.map((row, i) => (
             <View key={i} style={styles.tileRow}>
               {row.map((item) => (
@@ -645,20 +612,9 @@ export default function MedicinesScreen({ onBack }: { onBack?: () => void }) {
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  content: {
-    paddingHorizontal: 14,
-    paddingTop: 14,
-    paddingBottom: 36,
-  },
-  topRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
+  root: { flex: 1, backgroundColor: '#ffffff' },
+  content: { paddingHorizontal: 12, paddingTop: 14, paddingBottom: 24 },
+  topRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   backButton: {
     marginRight: 8,
     padding: 4,
@@ -678,16 +634,8 @@ const styles = StyleSheet.create({
     gap: 5,
     marginRight: 10,
   },
-  locationCity: {
-    fontFamily: 'Roboto_700Bold',
-    fontSize: 16,
-    color: '#19112c',
-  },
-  locationCountry: {
-    fontFamily: 'Roboto_400Regular',
-    fontSize: 16,
-    color: '#706a80',
-  },
+  locationCity: { fontFamily: 'Roboto_700Bold', fontSize: 16, color: '#19112c' },
+  locationCountry: { fontFamily: 'Roboto_400Regular', fontSize: 16, color: '#706a80' },
   headerCartBtn: {
     padding: 6,
     position: 'relative',
@@ -712,72 +660,171 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
 
-  // Main Home Search Bar (Pressable)
+  // Home Screen Search Bar (Pressable to open search screen)
   searchBar: {
-    height: 48,
-    borderRadius: 12,
+    height: 46,
+    borderRadius: 8,
     borderWidth: 1,
     borderColor: '#cecbd3',
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
+    paddingHorizontal: 13,
     gap: 10,
-    marginTop: 16,
-    backgroundColor: '#fbfaff',
+    marginTop: 17,
+    backgroundColor: '#ffffff',
   },
-  searchPlaceholder: {
+  searchInputPlaceholder: {
     flex: 1,
     fontFamily: 'Roboto_400Regular',
-    fontSize: 14.5,
+    fontSize: 15.3,
     color: '#827d90',
   },
 
-  // Order Medicines Showcase Section
-  orderMedicinesSection: {
-    marginTop: 24,
-    marginBottom: 8,
-    gap: 14,
-  },
-  sectionHeaderRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-    justifyContent: 'space-between',
-  },
+  // Popular Categories Section (Original 20 items)
   heading: {
     fontFamily: 'Roboto_700Bold',
-    fontSize: 18,
+    fontSize: 16,
     color: '#19112c',
+    marginTop: 26,
+    marginBottom: 16,
   },
-  subheading: {
+  tileRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8.5 },
+  tile: { width: 78, alignItems: 'center' },
+  tileImage: { width: 78, height: 79, borderRadius: 9 },
+  tileLabel: {
     fontFamily: 'Roboto_400Regular',
-    fontSize: 12,
-    color: '#706a80',
-    marginTop: 2,
-  },
-  viewAllText: {
-    fontFamily: 'Roboto_600SemiBold',
-    fontSize: 13,
-    color: '#6b52ae',
-  },
-  medicineCardList: {
-    gap: 10,
-  },
-  viewAllFullBtn: {
-    backgroundColor: '#f5f2fc',
-    borderRadius: 10,
-    paddingVertical: 12,
-    alignItems: 'center',
-    borderWidth: 1,
-    borderColor: '#e8e2f6',
+    fontSize: 12.5,
+    lineHeight: 18,
+    color: '#19112c',
+    textAlign: 'center',
+    width: 84,
     marginTop: 4,
   },
-  viewAllFullBtnText: {
-    fontFamily: 'Roboto_600SemiBold',
-    fontSize: 13.5,
+
+  // ==========================================
+  // SEARCH SCREEN STYLES (Second Screen)
+  // ==========================================
+  searchScreenRoot: {
+    flex: 1,
+    backgroundColor: '#ffffff',
+  },
+  searchHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: '#f0edf7',
+    gap: 8,
+  },
+  activeSearchBar: {
+    flex: 1,
+    height: 44,
+    borderRadius: 8,
+    backgroundColor: '#f5f3fa',
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    gap: 8,
+  },
+  activeSearchInput: {
+    flex: 1,
+    height: '100%',
+    fontFamily: 'Roboto_400Regular',
+    fontSize: 14.5,
+    color: '#19112c',
+    paddingVertical: 0,
+    outlineWidth: 0,
+  } as object,
+  clearBtn: {
+    padding: 4,
+  },
+  filterTabsRow: {
+    borderBottomWidth: 1,
+    borderBottomColor: '#f2f0f8',
+    paddingVertical: 8,
+  },
+  filterTabsContent: {
+    paddingHorizontal: 12,
+    gap: 8,
+  },
+  filterChip: {
+    paddingHorizontal: 13,
+    paddingVertical: 6,
+    borderRadius: 16,
+    backgroundColor: '#f4f2f9',
+    borderWidth: 1,
+    borderColor: '#e8e4f2',
+  },
+  activeFilterChip: {
+    backgroundColor: '#6b52ae',
+    borderColor: '#6b52ae',
+  },
+  filterChipText: {
+    fontFamily: 'Roboto_500Medium',
+    fontSize: 12.5,
     color: '#6b52ae',
   },
+  activeFilterChipText: {
+    color: '#ffffff',
+  },
+  searchResultsScroll: {
+    flex: 1,
+  },
+  searchResultsContent: {
+    paddingHorizontal: 12,
+    paddingTop: 12,
+    paddingBottom: 30,
+    gap: 10,
+  },
+  resultSummaryRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 4,
+  },
+  resultCountText: {
+    fontFamily: 'Roboto_500Medium',
+    fontSize: 13,
+    color: '#706a80',
+  },
+  activeCategoryLabel: {
+    fontFamily: 'Roboto_600SemiBold',
+    fontSize: 12,
+    color: '#6b52ae',
+  },
+  emptyContainer: {
+    paddingVertical: 50,
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  emptyTitle: {
+    fontFamily: 'Roboto_700Bold',
+    fontSize: 16,
+    color: '#19112c',
+    marginBottom: 6,
+  },
+  emptySub: {
+    fontFamily: 'Roboto_400Regular',
+    fontSize: 13,
+    color: '#827d90',
+    textAlign: 'center',
+    lineHeight: 18,
+    marginBottom: 16,
+  },
+  clearSearchBtn: {
+    backgroundColor: '#6b52ae',
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+    borderRadius: 8,
+  },
+  clearSearchBtnText: {
+    fontFamily: 'Roboto_500Medium',
+    fontSize: 13,
+    color: '#ffffff',
+  },
 
-  // Medicine Item Card
+  // Medicine Item Card in Search Results
   medicineCard: {
     backgroundColor: '#ffffff',
     borderRadius: 14,
@@ -920,153 +967,6 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     minWidth: 14,
     textAlign: 'center',
-  },
-
-  // Categories Grid (Original 20)
-  tileRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8.5,
-  },
-  tile: {
-    width: 78,
-    alignItems: 'center',
-  },
-  tileImage: {
-    width: 78,
-    height: 79,
-    borderRadius: 9,
-  },
-  tileLabel: {
-    fontFamily: 'Roboto_400Regular',
-    fontSize: 11.5,
-    lineHeight: 14,
-    color: '#19112c',
-    textAlign: 'center',
-    marginTop: 5,
-  },
-
-  // ==========================================
-  // MODE 2: SEARCH SCREEN STYLES
-  // ==========================================
-  searchScreenRoot: {
-    flex: 1,
-    backgroundColor: '#ffffff',
-  },
-  searchHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0edf7',
-    gap: 8,
-  },
-  activeSearchBar: {
-    flex: 1,
-    height: 44,
-    borderRadius: 10,
-    backgroundColor: '#f5f3fa',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    gap: 8,
-  },
-  activeSearchInput: {
-    flex: 1,
-    height: '100%',
-    fontFamily: 'Roboto_400Regular',
-    fontSize: 14.5,
-    color: '#19112c',
-    paddingVertical: 0,
-    outlineWidth: 0,
-  } as object,
-  clearBtn: {
-    padding: 4,
-  },
-  filterTabsRow: {
-    borderBottomWidth: 1,
-    borderBottomColor: '#f2f0f8',
-    paddingVertical: 8,
-  },
-  filterTabsContent: {
-    paddingHorizontal: 14,
-    gap: 8,
-  },
-  filterChip: {
-    paddingHorizontal: 13,
-    paddingVertical: 6,
-    borderRadius: 16,
-    backgroundColor: '#f4f2f9',
-    borderWidth: 1,
-    borderColor: '#e8e4f2',
-  },
-  activeFilterChip: {
-    backgroundColor: '#6b52ae',
-    borderColor: '#6b52ae',
-  },
-  filterChipText: {
-    fontFamily: 'Roboto_500Medium',
-    fontSize: 12.5,
-    color: '#6b52ae',
-  },
-  activeFilterChipText: {
-    color: '#ffffff',
-  },
-  searchResultsScroll: {
-    flex: 1,
-  },
-  searchResultsContent: {
-    paddingHorizontal: 14,
-    paddingTop: 12,
-    paddingBottom: 30,
-    gap: 10,
-  },
-  resultSummaryRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 4,
-  },
-  resultCountText: {
-    fontFamily: 'Roboto_500Medium',
-    fontSize: 13,
-    color: '#706a80',
-  },
-  activeCategoryLabel: {
-    fontFamily: 'Roboto_600SemiBold',
-    fontSize: 12,
-    color: '#6b52ae',
-  },
-  emptyContainer: {
-    paddingVertical: 50,
-    alignItems: 'center',
-    paddingHorizontal: 24,
-  },
-  emptyTitle: {
-    fontFamily: 'Roboto_700Bold',
-    fontSize: 16,
-    color: '#19112c',
-    marginBottom: 6,
-  },
-  emptySub: {
-    fontFamily: 'Roboto_400Regular',
-    fontSize: 13,
-    color: '#827d90',
-    textAlign: 'center',
-    lineHeight: 18,
-    marginBottom: 16,
-  },
-  clearSearchBtn: {
-    backgroundColor: '#6b52ae',
-    paddingHorizontal: 18,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
-  clearSearchBtnText: {
-    fontFamily: 'Roboto_500Medium',
-    fontSize: 13,
-    color: '#ffffff',
   },
 
   // Floating Cart Bar
