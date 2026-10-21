@@ -64,7 +64,7 @@ const ICONS = {
 
 const SHORTCUTS = [
   { label: 'Book\nLab Tests', image: require('./assets/images/home/icon-lab.png') },
-  { label: 'Plan\nSurgeries', image: require('./assets/images/home/icon-surgeries.png') },
+  { label: 'Health\nRecord', image: require('./assets/images/home/icon-surgeries.png') },
   { label: 'Order\nMedicines', image: require('./assets/images/home/icon-medicines.png') },
   { label: 'Buy\nSubscriptions', image: require('./assets/images/home/icon-subscriptions.png') },
 ];
