@@ -1,6 +1,8 @@
+import { useMemo, useRef, useState } from 'react';
 import {
   Image,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -35,39 +37,134 @@ const SEARCH_SVG = `<svg width="22" height="24" viewBox="0 0 22 24" fill="none" 
 <circle cx="10" cy="10" r="8.1" stroke="#6B52AE" stroke-width="1.8"/>
 </svg>`;
 
-// Specialty artwork cropped from the Figma node's own hi-res reference
-// sheet (1376x3104) at each tile's exact window coordinates.
-const SPECIALTIES: { label: string; image: number }[][] = [
-  [
-    { label: 'General\nPractitioner', image: require('./assets/images/consult/spec-general.png') },
-    { label: "Women's\nHealth", image: require('./assets/images/consult/spec-women.png') },
-    { label: 'Dermatology', image: require('./assets/images/consult/spec-dermatology.png') },
-    { label: 'Psychiatry', image: require('./assets/images/consult/spec-psychiatry.png') },
-  ],
-  [
-    { label: 'Urology', image: require('./assets/images/consult/spec-urology.png') },
-    { label: 'ENT', image: require('./assets/images/consult/spec-ent.png') },
-    { label: 'Cardiology', image: require('./assets/images/consult/spec-cardiology.png') },
-    { label: 'Paediatrics', image: require('./assets/images/consult/spec-paediatrics.png') },
-  ],
-  [
-    { label: 'Digestive\nHealth', image: require('./assets/images/consult/spec-digestive.png') },
-    { label: 'Neurology', image: require('./assets/images/consult/spec-neurology.png') },
-    { label: 'Orthopaedics', image: require('./assets/images/consult/spec-orthopaedics.png') },
-    { label: 'Thyroid\nCare', image: require('./assets/images/consult/spec-thyroid.png') },
-  ],
-  [
-    { label: 'Diabetology', image: require('./assets/images/consult/spec-diabetology.png') },
-  ],
+const CLEAR_SVG = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M12 4L4 12M4 4L12 12" stroke="#7e8184" stroke-width="2" stroke-linecap="round"/>
+</svg>`;
+
+type Specialty = {
+  label: string;
+  name: string;
+  keywords: string[];
+  image: number;
+};
+
+const ALL_SPECIALTIES: Specialty[] = [
+  {
+    label: 'General\nPractitioner',
+    name: 'General Practitioner',
+    keywords: ['general', 'physician', 'practitioner', 'doctor', 'fever', 'cold', 'cough', 'flu', 'headache', 'infection'],
+    image: require('./assets/images/consult/general-practitioner.png'),
+  },
+  {
+    label: "Women's\nHealth",
+    name: "Women's Health",
+    keywords: ['women', 'health', 'gynecology', 'gynaecology', 'pregnancy', 'period', 'fertility', 'pcos'],
+    image: require('./assets/images/consult/womens-health.png'),
+  },
+  {
+    label: 'Dermatology',
+    name: 'Dermatology',
+    keywords: ['dermatology', 'skin', 'hair', 'acne', 'rash', 'pimples', 'scalp', 'allergy'],
+    image: require('./assets/images/consult/dermatology.png'),
+  },
+  {
+    label: 'Psychiatry',
+    name: 'Psychiatry',
+    keywords: ['psychiatry', 'mental', 'depression', 'anxiety', 'stress', 'therapy', 'mood', 'sleep'],
+    image: require('./assets/images/consult/psychiatry.png'),
+  },
+  {
+    label: 'Urology',
+    name: 'Urology',
+    keywords: ['urology', 'kidney', 'urine', 'urinary', 'bladder', 'prostate', 'stone'],
+    image: require('./assets/images/consult/urology.png'),
+  },
+  {
+    label: 'ENT',
+    name: 'ENT',
+    keywords: ['ent', 'ear', 'nose', 'throat', 'sinus', 'hearing', 'tonsil'],
+    image: require('./assets/images/consult/ent.png'),
+  },
+  {
+    label: 'Cardiology',
+    name: 'Cardiology',
+    keywords: ['cardiology', 'heart', 'cardio', 'chest', 'bp', 'blood pressure', 'hypertension'],
+    image: require('./assets/images/consult/cardiology.png'),
+  },
+  {
+    label: 'Paediatrics',
+    name: 'Paediatrics',
+    keywords: ['paediatrics', 'pediatrics', 'child', 'baby', 'kids', 'infant', 'vaccination'],
+    image: require('./assets/images/consult/paediatrics.png'),
+  },
+  {
+    label: 'Digestive\nHealth',
+    name: 'Digestive Health',
+    keywords: ['digestive', 'health', 'gastro', 'stomach', 'gut', 'acidity', 'gas', 'constipation', 'digestion'],
+    image: require('./assets/images/consult/digestive-health.png'),
+  },
+  {
+    label: 'Neurology',
+    name: 'Neurology',
+    keywords: ['neurology', 'neuro', 'brain', 'nerves', 'migraine', 'stroke', 'seizure', 'paralysis'],
+    image: require('./assets/images/consult/neurology.png'),
+  },
+  {
+    label: 'Orthopaedics',
+    name: 'Orthopaedics',
+    keywords: ['orthopaedics', 'ortho', 'bone', 'joint', 'fracture', 'knee', 'back pain', 'spine', 'muscle'],
+    image: require('./assets/images/consult/orthopaedics.png'),
+  },
+  {
+    label: 'Thyroid\nCare',
+    name: 'Thyroid Care',
+    keywords: ['thyroid', 'care', 'hormone', 'weight', 'hypothyroid', 'hyperthyroid', 'goiter'],
+    image: require('./assets/images/consult/thyroid-care.png'),
+  },
+  {
+    label: 'Diabetology',
+    name: 'Diabetology',
+    keywords: ['diabetology', 'diabetes', 'sugar', 'glucose', 'insulin', 'hba1c'],
+    image: require('./assets/images/consult/diabetology.png'),
+  },
 ];
 
-export default function ConsultScreen({ onBack }: { onBack: () => void }) {
+export default function ConsultScreen({
+  onBack,
+  onSelectDoctor,
+}: {
+  onBack: () => void;
+  onSelectDoctor?: () => void;
+}) {
   const insets = useSafeAreaInsets();
+  const inputRef = useRef<any>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [fontsLoaded] = useFonts({
     Roboto_400Regular,
     Roboto_500Medium,
     Roboto_700Bold,
   });
+
+  const filteredRows = useMemo(() => {
+    const q = searchQuery.trim().toLowerCase();
+    const items = q
+      ? ALL_SPECIALTIES.filter((s) => {
+          const cleanName = s.name.toLowerCase();
+          const cleanLabel = s.label.replace('\n', ' ').toLowerCase();
+          return (
+            cleanName.includes(q) ||
+            cleanLabel.includes(q) ||
+            s.keywords.some((k) => k.includes(q) || q.includes(k))
+          );
+        })
+      : ALL_SPECIALTIES;
+
+    const rows: Specialty[][] = [];
+    for (let i = 0; i < items.length; i += 4) {
+      rows.push(items.slice(i, i + 4));
+    }
+    return rows;
+  }, [searchQuery]);
 
   if (!fontsLoaded) {
     return null;
@@ -79,61 +176,126 @@ export default function ConsultScreen({ onBack }: { onBack: () => void }) {
 
       {/* Consultation header (Figma 22:194) */}
       <View style={styles.header}>
-        <Pressable
-          style={styles.backButton}
-          onPress={onBack}
-          accessibilityLabel="Back"
-        >
-          <SvgXml xml={BACK_SVG} width={25} height={16} />
-        </Pressable>
-        <Text style={styles.headerTitle}>ONLINE CONSULT</Text>
+        <View style={styles.topRow}>
+          <View style={styles.titleGroup}>
+            <Pressable
+              style={styles.backButton}
+              onPress={onBack}
+              accessibilityLabel="Back"
+              hitSlop={8}
+            >
+              <SvgXml xml={BACK_SVG} width={25} height={16} />
+            </Pressable>
+            <Text style={styles.headerTitle} numberOfLines={1}>
+              ONLINE CONSULTANT
+            </Text>
+          </View>
 
-        <Text style={styles.locationLabel}>Your Location:</Text>
-        <View style={styles.locationRow}>
-          <SvgXml xml={PIN_SVG} width={11} height={15} />
-          <Text style={styles.locationText}>Barabanki 225003</Text>
-          <SvgXml xml={CHEVRON_SVG} width={10} height={7} />
+          <View style={styles.locationRow}>
+            <SvgXml xml={PIN_SVG} width={11} height={15} />
+            <Text style={styles.locationText} numberOfLines={1}>
+              Barabanki 225003
+            </Text>
+            <SvgXml xml={CHEVRON_SVG} width={10} height={7} />
+          </View>
         </View>
 
-        <View style={styles.searchBar}>
+        <Pressable
+          style={styles.searchBar}
+          onPress={() => inputRef.current?.focus()}
+        >
           <SvgXml xml={SEARCH_SVG} width={22} height={24} />
           <TextInput
+            ref={inputRef}
             style={styles.searchInput}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
             placeholder="Search Doctors, specialties, symptoms..."
             placeholderTextColor="#7e8184"
+            returnKeyType="search"
+            autoCorrect={false}
+            autoCapitalize="none"
+            clearButtonMode="while-editing"
           />
-        </View>
+          {searchQuery.length > 0 && (
+            <Pressable
+              style={styles.clearIconButton}
+              onPress={() => setSearchQuery('')}
+              accessibilityLabel="Clear search"
+              hitSlop={8}
+            >
+              <SvgXml xml={CLEAR_SVG} width={16} height={16} />
+            </Pressable>
+          )}
+        </Pressable>
       </View>
 
       {/* Medical specialties (Figma 22:207) */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Speciality</Text>
+      <ScrollView
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>
+            {searchQuery.trim()
+              ? `Search Results (${filteredRows.reduce((acc, r) => acc + r.length, 0)})`
+              : 'Speciality'}
+          </Text>
 
-        {SPECIALTIES.map((row, i) => (
-          <View
-            key={i}
-            style={[styles.tileRow, i > 0 && styles.tileRowGap]}
-          >
-            {row.map((item) => (
-              <View key={item.label} style={styles.tile}>
-                <View style={styles.tileCard}>
-                  <Image
-                    source={item.image}
-                    style={styles.tileImage}
-                    resizeMode="cover"
-                  />
-                </View>
-                <Text style={styles.tileLabel}>{item.label}</Text>
+          {filteredRows.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyTitle}>No matches found</Text>
+              <Text style={styles.emptySubtitle}>
+                Try searching for general practitioner, dermatology, heart, fever, etc.
+              </Text>
+              <Pressable
+                style={styles.clearBtn}
+                onPress={() => setSearchQuery('')}
+              >
+                <Text style={styles.clearBtnText}>Clear Search</Text>
+              </Pressable>
+            </View>
+          ) : (
+            filteredRows.map((row, i) => (
+              <View
+                key={i}
+                style={[styles.tileRow, i > 0 && styles.tileRowGap]}
+              >
+                {row.map((item) => {
+                  const isTargetDoctor =
+                    item.label.includes('General') ||
+                    item.label.includes('Women') ||
+                    item.label.includes('Dermatology');
+
+                  return (
+                    <Pressable
+                      key={item.label}
+                      style={({ pressed }) => [
+                        styles.tile,
+                        isTargetDoctor && pressed && { opacity: 0.75, transform: [{ scale: 0.96 }] },
+                      ]}
+                      onPress={isTargetDoctor ? onSelectDoctor : undefined}
+                      accessibilityRole={isTargetDoctor ? 'button' : undefined}
+                      accessibilityLabel={item.label.replace('\n', ' ')}
+                    >
+                      <View style={styles.tileCard}>
+                        <Image
+                          source={item.image}
+                          style={styles.tileImage}
+                          resizeMode="cover"
+                        />
+                      </View>
+                      <Text style={styles.tileLabel}>{item.label}</Text>
+                    </Pressable>
+                  );
+                })}
               </View>
-            ))}
-          </View>
-        ))}
-
-        <View style={styles.symptomsRow}>
-          <Text style={styles.symptomsTitle}>Find Doctor by Symptoms</Text>
-          <Text style={styles.viewAll}>View All</Text>
+            ))
+          )}
         </View>
-      </View>
+      </ScrollView>
     </View>
   );
 }
@@ -144,54 +306,45 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffff',
   },
   header: {
-    height: 169,
+    paddingTop: 12,
+    paddingBottom: 14,
     borderBottomWidth: 1,
     borderBottomColor: '#d8d0e8',
-    position: 'relative',
+  },
+  topRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 14,
+  },
+  titleGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   backButton: {
-    position: 'absolute',
-    left: 14,
-    top: 61,
     width: 25,
     height: 16,
     justifyContent: 'center',
   },
   headerTitle: {
-    position: 'absolute',
-    left: 52,
-    top: 62,
     fontFamily: 'Roboto_700Bold',
     fontSize: 13.5,
     color: '#6b52ae',
   },
-  locationLabel: {
-    position: 'absolute',
-    left: 220,
-    top: 53,
-    fontFamily: 'Roboto_400Regular',
-    fontSize: 12.5,
-    color: '#999c9c',
-  },
   locationRow: {
-    position: 'absolute',
-    left: 202,
-    top: 70,
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
   },
   locationText: {
     fontFamily: 'Roboto_700Bold',
     fontSize: 12.5,
     color: '#1d1b26',
-    marginLeft: 7,
-    marginRight: 18,
   },
   searchBar: {
-    position: 'absolute',
-    left: 14,
-    top: 111,
-    width: 332,
+    marginTop: 14,
+    marginHorizontal: 14,
     height: 48,
     backgroundColor: '#ffffff',
     borderWidth: 1,
@@ -204,11 +357,55 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
+    height: '100%',
     fontFamily: 'Roboto_400Regular',
     fontSize: 15,
     color: '#1d1b26',
+    paddingVertical: 0,
     outlineWidth: 0,
   } as object,
+  clearIconButton: {
+    padding: 6,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scroll: {
+    flex: 1,
+  },
+  scrollContent: {
+    paddingBottom: 40,
+  },
+  emptyContainer: {
+    paddingVertical: 48,
+    alignItems: 'center',
+    paddingHorizontal: 24,
+  },
+  emptyTitle: {
+    fontFamily: 'Roboto_700Bold',
+    fontSize: 17,
+    color: '#1d1b26',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptySubtitle: {
+    fontFamily: 'Roboto_400Regular',
+    fontSize: 14,
+    color: '#7e8184',
+    textAlign: 'center',
+    lineHeight: 20,
+    marginBottom: 20,
+  },
+  clearBtn: {
+    backgroundColor: '#6b52ae',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
+  clearBtnText: {
+    fontFamily: 'Roboto_500Medium',
+    fontSize: 14,
+    color: '#ffffff',
+  },
   section: {
     flex: 1,
     paddingHorizontal: 14,
@@ -257,25 +454,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     width: 86,
     marginTop: 9,
-  },
-  symptomsRow: {
-    position: 'absolute',
-    left: 14,
-    right: 14,
-    bottom: 5,
-    height: 28,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  viewAll: {
-    fontFamily: 'Roboto_700Bold',
-    fontSize: 15,
-    color: '#6b52ae',
-  },
-  symptomsTitle: {
-    fontFamily: 'Roboto_700Bold',
-    fontSize: 17.5,
-    color: '#1d1b26',
   },
 });

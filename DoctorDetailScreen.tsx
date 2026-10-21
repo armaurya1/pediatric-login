@@ -14,7 +14,6 @@ import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SvgXml } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useFonts, Roboto_400Regular, Roboto_500Medium } from '@expo-google-fonts/roboto';
 
 // Icons: the screen's own Figma SVGs (node 143:30).
 const CHEVRON_LEFT_SVG = `<svg width="17" height="17" viewBox="0 0 17 17" fill="none" xmlns="http://www.w3.org/2000/svg"><g><path d="M10.625 12.75L6.375 8.5L10.625 4.25" stroke-width="2" stroke-linecap="round" stroke="white"/></g></svg>`;
@@ -55,17 +54,16 @@ const STATS = [
   { icon: USERS_SVG, value: '2.7K+', label: 'Patients' },
   { icon: STAR_LG_SVG, value: '4.8', label: 'Reviews' },
 ];
+const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
   const insets = useSafeAreaInsets();
   const { height: windowHeight, width: windowWidth } = useWindowDimensions();
-  const [fontsLoaded] = useFonts({ Roboto_400Regular, Roboto_500Medium });
   const [month, setMonth] = useState(1);
   const [day, setDay] = useState(5);
   const [time, setTime] = useState(0);
   const [scrollX] = useState(() => new Animated.Value((5 - 1) * DATE_ITEM_WIDTH));
   const dayScrollRef = useRef<ScrollViewInstance>(null);
-  if (!fontsLoaded) return null;
 
   const selectedMonth = MONTHS[month];
   const daysInMonth = new Date(
@@ -278,7 +276,7 @@ export default function DoctorDetailScreen({ onBack }: { onBack: () => void }) {
                       {dateNumber}
                     </Text>
                     <Text style={[styles.dayDow, active && styles.dayTextActive]}>
-                      {date.toLocaleDateString('en-US', { weekday: 'short' })}
+                      {WEEKDAYS[date.getDay()]}
                     </Text>
                   </Animated.View>
                   {active && <View style={styles.dayDot} />}

@@ -17,11 +17,17 @@ import {
   useSafeAreaInsets,
 } from 'react-native-safe-area-context';
 import { SvgXml } from 'react-native-svg';
+import { useFonts } from 'expo-font';
 import {
   Inter_400Regular,
   Inter_600SemiBold,
-  useFonts,
 } from '@expo-google-fonts/inter';
+import {
+  Roboto_400Regular,
+  Roboto_500Medium,
+  Roboto_600SemiBold,
+  Roboto_700Bold,
+} from '@expo-google-fonts/roboto';
 import VerificationScreen from './VerificationScreen';
 import HomeScreen from './HomeScreen';
 import ConsultScreen from './ConsultScreen';
@@ -52,9 +58,23 @@ const ICONS = {
 };
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    Inter_400Regular,
+    Inter_600SemiBold,
+    Roboto_400Regular,
+    Roboto_500Medium,
+    Roboto_600SemiBold,
+    Roboto_700Bold,
+  });
   const [screen, setScreen] = useState<
     'login' | 'verification' | 'home' | 'consult' | 'doctor'
   >('login');
+  const [doctorFrom, setDoctorFrom] = useState<'home' | 'consult'>('home');
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
     <SafeAreaProvider>
       {screen === 'login' ? (
@@ -62,13 +82,22 @@ export default function App() {
       ) : screen === 'verification' ? (
         <VerificationScreen onVerify={() => setScreen('home')} />
       ) : screen === 'consult' ? (
-        <ConsultScreen onBack={() => setScreen('home')} />
+        <ConsultScreen
+          onBack={() => setScreen('home')}
+          onSelectDoctor={() => {
+            setDoctorFrom('consult');
+            setScreen('doctor');
+          }}
+        />
       ) : screen === 'doctor' ? (
-        <DoctorDetailScreen onBack={() => setScreen('home')} />
+        <DoctorDetailScreen onBack={() => setScreen(doctorFrom)} />
       ) : (
         <HomeScreen
           onOnlineConsult={() => setScreen('consult')}
-          onDoctorProfile={() => setScreen('doctor')}
+          onDoctorProfile={() => {
+            setDoctorFrom('home');
+            setScreen('doctor');
+          }}
         />
       )}
     </SafeAreaProvider>

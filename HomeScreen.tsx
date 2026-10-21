@@ -152,12 +152,21 @@ export default function HomeScreen({ onOnlineConsult, onDoctorProfile }: Props) 
         {/* Healthcare services (Figma 34:555) */}
         <View style={styles.services}>
           <View style={styles.consultRow}>
-            <LinearGradient
-              colors={['#e8dff9', '#cba5f8']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.consultCard}
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Open in-person consultation"
+              onPress={onOnlineConsult}
+              style={({ pressed }) => [
+                styles.consultCard,
+                pressed && { opacity: 0.85 },
+              ]}
             >
+              <LinearGradient
+                colors={['#e8dff9', '#cba5f8']}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 0 }}
+                style={StyleSheet.absoluteFill}
+              />
               <Text style={styles.consultTitle}>
                 In-Person{'\n'}Consultation
               </Text>
@@ -171,7 +180,7 @@ export default function HomeScreen({ onOnlineConsult, onDoctorProfile }: Props) 
                 style={styles.doctorFace}
                 resizeMode="cover"
               />
-            </LinearGradient>
+            </Pressable>
             <Pressable
               accessibilityRole="button"
               accessibilityLabel="Open online consultation"
@@ -355,7 +364,7 @@ export default function HomeScreen({ onOnlineConsult, onDoctorProfile }: Props) 
                 key={tab.key}
                 style={[styles.tab, selected && styles.tabSelected]}
                 onPress={() => {
-                  if (tab.key === 'video') {
+                  if (tab.key === 'video' || tab.key === 'inPerson') {
                     onOnlineConsult();
                     return;
                   }
