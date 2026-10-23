@@ -24,6 +24,12 @@
     },
     "plugins": [
       "expo-font"
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "d5b22cf4-dca0-4992-b6a0-459c010ec10a"
+      }
+    },
+    "owner": "vipulmaurya1"
   }
 }
