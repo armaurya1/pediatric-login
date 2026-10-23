@@ -40,7 +40,10 @@ console.log('\x1b[36m%s\x1b[0m', '🚀 Submitting Android APK build to EAS (prof
 // 3. Run EAS build
 const isWin = process.platform === 'win32';
 const npxCmd = isWin ? 'npx.cmd' : 'npx';
-const fullCommand = `${npxCmd} eas-cli build --platform android --profile preview`;
+const extraArgs = process.argv.slice(2).join(' ');
+const fullCommand = `${npxCmd} eas-cli build --platform android --profile preview ${extraArgs}`.trim();
+
+console.log(`Running: ${fullCommand}\n`);
 
 const child = spawn(fullCommand, {
   stdio: 'inherit',
