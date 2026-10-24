@@ -59,10 +59,10 @@ const SHIELD_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" 
 </svg>`;
 
 const TRUCK_SVG = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect x="1" y="3" width="15" height="13" stroke="#107a6e" stroke-width="2" stroke-linecap="round"/>
-<polygon points="16 8 20 8 23 11 23 16 16 16 16 8" stroke="#107a6e" stroke-width="2" stroke-linecap="round"/>
-<circle cx="5.5" cy="18.5" r="2.5" stroke="#107a6e" stroke-width="2"/>
-<circle cx="18.5" cy="18.5" r="2.5" stroke="#107a6e" stroke-width="2"/>
+<rect x="1" y="3" width="15" height="13" stroke="#6b52ae" stroke-width="2" stroke-linecap="round"/>
+<polygon points="16 8 20 8 23 11 23 16 16 16 16 8" stroke="#6b52ae" stroke-width="2" stroke-linecap="round"/>
+<circle cx="5.5" cy="18.5" r="2.5" stroke="#6b52ae" stroke-width="2"/>
+<circle cx="18.5" cy="18.5" r="2.5" stroke="#6b52ae" stroke-width="2"/>
 </svg>`;
 
 // Clean Home Screen SVGs (Preserved)
@@ -894,7 +894,7 @@ const styles = StyleSheet.create({
     marginLeft: 6,
   },
   cardAddButton: {
-    backgroundColor: '#107a6e',
+    backgroundColor: '#6b52ae',
     height: 38,
     borderRadius: 8,
     alignItems: 'center',
@@ -908,9 +908,9 @@ const styles = StyleSheet.create({
   cardQtySelector: {
     height: 38,
     borderRadius: 8,
-    backgroundColor: '#e6f7f4',
+    backgroundColor: '#f3eefb',
     borderWidth: 1.5,
-    borderColor: '#107a6e',
+    borderColor: '#6b52ae',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -923,12 +923,12 @@ const styles = StyleSheet.create({
   cardQtyBtnText: {
     fontFamily: 'Roboto_700Bold',
     fontSize: 18,
-    color: '#107a6e',
+    color: '#6b52ae',
   },
   cardQtyValue: {
     fontFamily: 'Roboto_700Bold',
     fontSize: 14,
-    color: '#107a6e',
+    color: '#6b52ae',
   },
   cardSavingsPill: {
     height: 28,
@@ -936,7 +936,7 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     backgroundColor: '#fffdfa',
     borderWidth: 1,
-    borderColor: '#bee3db',
+    borderColor: '#d8d0e8',
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 8,
@@ -954,7 +954,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 12,
     right: 12,
-    backgroundColor: '#107a6e',
+    backgroundColor: '#6b52ae',
     borderRadius: 12,
     paddingVertical: 12,
     paddingHorizontal: 16,
@@ -974,7 +974,7 @@ const styles = StyleSheet.create({
   cartCountText: {
     fontFamily: 'Roboto_400Regular',
     fontSize: 12,
-    color: '#e6f7f4',
+    color: '#f3eefb',
   },
   cartPriceTotal: {
     fontFamily: 'Roboto_700Bold',
@@ -990,7 +990,7 @@ const styles = StyleSheet.create({
   cartOrderButtonText: {
     fontFamily: 'Roboto_700Bold',
     fontSize: 13,
-    color: '#107a6e',
+    color: '#6b52ae',
   },
 
   // Empty Results Box
@@ -1014,7 +1014,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   resetSearchBtn: {
-    backgroundColor: '#107a6e',
+    backgroundColor: '#6b52ae',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
@@ -1077,7 +1077,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 2,
     right: 2,
-    backgroundColor: '#107a6e',
+    backgroundColor: '#6b52ae',
     minWidth: 17,
     height: 17,
     borderRadius: 9,
@@ -1167,7 +1167,7 @@ const styles = StyleSheet.create({
     borderBottomColor: '#f0f0f4',
   },
   modalCategoryBadge: {
-    backgroundColor: '#e6f7f4',
+    backgroundColor: '#f3eefb',
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 6,
@@ -1175,7 +1175,7 @@ const styles = StyleSheet.create({
   modalCategoryBadgeText: {
     fontFamily: 'Roboto_700Bold',
     fontSize: 11,
-    color: '#107a6e',
+    color: '#6b52ae',
   },
   modalCloseBtn: {
     padding: 6,
@@ -1264,7 +1264,7 @@ const styles = StyleSheet.create({
     textDecorationLine: 'line-through',
   },
   savingsTag: {
-    backgroundColor: '#e8faf0',
+    backgroundColor: '#f3eefb',
     paddingHorizontal: 8,
     paddingVertical: 4,
     borderRadius: 6,
@@ -1272,7 +1272,7 @@ const styles = StyleSheet.create({
   savingsTagText: {
     fontFamily: 'Roboto_700Bold',
     fontSize: 12,
-    color: '#065f46',
+    color: '#6b52ae',
   },
   modalSpecsRow: {
     flexDirection: 'row',
@@ -1317,7 +1317,7 @@ const styles = StyleSheet.create({
   modalDeliveryNote: {
     fontFamily: 'Roboto_400Regular',
     fontSize: 11.5,
-    color: '#107a6e',
+    color: '#6b52ae',
   },
   modalBottomAction: {
     paddingHorizontal: 20,
@@ -1326,7 +1326,7 @@ const styles = StyleSheet.create({
     borderTopColor: '#f0f0f4',
   },
   modalAddToCartBtn: {
-    backgroundColor: '#107a6e',
+    backgroundColor: '#6b52ae',
     height: 50,
     borderRadius: 12,
     alignItems: 'center',
