@@ -34,6 +34,7 @@ import ConsultScreen from './ConsultScreen';
 import DoctorDetailScreen from './DoctorDetailScreen';
 import MedicinesScreen from './MedicinesScreen';
 import LabTestsScreen from './LabTestsScreen';
+import AskCareScreen from './AskCareScreen';
 
 // SVG icons downloaded fresh from Figma (file q4OVzpZDgUgZoTikqnYWoh, node 2:84)
 const ICONS = {
@@ -69,7 +70,7 @@ export default function App() {
     Roboto_700Bold,
   });
   const [screen, setScreen] = useState<
-    'login' | 'verification' | 'home' | 'consult' | 'doctor' | 'medicines' | 'labTests'
+    'login' | 'verification' | 'home' | 'consult' | 'doctor' | 'medicines' | 'labTests' | 'askCare'
   >('login');
   const [doctorFrom, setDoctorFrom] = useState<'home' | 'consult'>('home');
   const [recentlyViewed, setRecentlyViewed] = useState<RecentItem[]>([
@@ -120,6 +121,8 @@ export default function App() {
         <MedicinesScreen onBack={() => setScreen('home')} />
       ) : screen === 'labTests' ? (
         <LabTestsScreen onBack={() => setScreen('home')} />
+      ) : screen === 'askCare' ? (
+        <AskCareScreen onBack={() => setScreen('home')} />
       ) : (
         <HomeScreen
           onOnlineConsult={() => setScreen('consult')}
@@ -132,6 +135,7 @@ export default function App() {
           }}
           onMedicines={() => setScreen('medicines')}
           onLabTests={() => setScreen('labTests')}
+          onAskCare={() => setScreen('askCare')}
           recentlyViewed={recentlyViewed}
         />
       )}

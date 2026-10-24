@@ -99,6 +99,7 @@ type Props = {
   onDoctorProfile: (specialtyName?: string) => void;
   onMedicines?: () => void;
   onLabTests?: () => void;
+  onAskCare?: () => void;
   recentlyViewed?: RecentItem[];
 };
 
@@ -107,6 +108,7 @@ export default function HomeScreen({
   onDoctorProfile,
   onMedicines,
   onLabTests,
+  onAskCare,
   recentlyViewed = DEFAULT_RECENT,
 }: Props) {
   const insets = useSafeAreaInsets();
@@ -167,8 +169,12 @@ export default function HomeScreen({
                 placeholderTextColor="#7b788b"
               />
             </View>
-            <LinearGradient
-              colors={['#fbf8ff', '#e9d6fe']}
+            <Pressable
+              onPress={onAskCare}
+              accessibilityLabel="Ask Care AI"
+            >
+              <LinearGradient
+                colors={['#fbf8ff', '#e9d6fe']}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.askPill}
@@ -178,7 +184,8 @@ export default function HomeScreen({
               </View>
               <Text style={styles.askLine1}>Ask</Text>
               <Text style={styles.askLine2}>Care AI</Text>
-            </LinearGradient>
+              </LinearGradient>
+            </Pressable>
           </View>
         </View>
 
@@ -331,7 +338,7 @@ export default function HomeScreen({
                   Get trustworthy, instant &amp; free answers to your health
                   queries
                 </Text>
-                <Pressable style={styles.askNow}>
+                <Pressable style={styles.askNow} onPress={onAskCare}>
                   <Text style={styles.askNowText}>Ask Now</Text>
                 </Pressable>
               </View>
