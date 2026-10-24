@@ -30,11 +30,6 @@ const CHEVRON_DOWN_THICK_SVG = `<svg width="10" height="6" viewBox="0 0 10 6" fi
 <path d="M1 1L5 5L9 1" stroke="#1D2129" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
 
-const CAMERA_SVG = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M23 19C23 19.5304 22.7893 20.0391 22.4142 20.4142C22.0391 20.7893 21.5304 21 21 21H3C2.46957 21 1.96086 20.7893 1.58579 20.4142C1.21071 20.0391 1 19.5304 1 19V8C1 7.46957 1.21071 6.96086 1.58579 6.58579C1.96086 6.21071 2.46957 6 3 6H7L9 3H15L17 6H21C21.5304 6 22.0391 6.21071 22.4142 6.58579C22.7893 6.96086 23 7.46957 23 8V19Z" stroke="#71747E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="12" cy="13" r="4" stroke="#71747E" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-</svg>`;
-
 const GOLD_COIN_SVG = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <circle cx="12" cy="12" r="10" fill="#F59E0B" stroke="#D97706" stroke-width="1.5"/>
 <circle cx="12" cy="12" r="7.5" stroke="#FDE68A" stroke-width="1.2"/>
@@ -49,11 +44,6 @@ const CHEVRON_DOUBLE_DOWN_SVG = `<svg width="9" height="9" viewBox="0 0 24 24" f
 const PILL_ICON_SVG = `<svg width="15" height="15" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
 <rect x="2" y="8" width="14" height="8" rx="4" transform="rotate(-45 2 8)" fill="#F59E0B" fill-opacity="0.25" stroke="#F59E0B" stroke-width="1.8"/>
 <circle cx="15.5" cy="15.5" r="4.5" fill="#38BDF8" fill-opacity="0.35" stroke="#0284C7" stroke-width="1.8"/>
-</svg>`;
-
-const PERCENT_BADGE_SVG = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect width="24" height="24" rx="12" fill="#107A6E"/>
-<path d="M8 16L16 8M9 9H9.01M15 15H15.01" stroke="white" stroke-width="2.5" stroke-linecap="round"/>
 </svg>`;
 
 const CLEAR_SVG = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -385,20 +375,6 @@ export default function MedicinesScreen({ onBack }: { onBack?: () => void }) {
                 <SvgXml xml={CLEAR_SVG} width={15} height={15} />
               </Pressable>
             )}
-
-            <Pressable
-              onPress={() =>
-                Alert.alert(
-                  'Upload Prescription',
-                  'Upload or take a photo of your doctor’s prescription to automatically order medicines.',
-                )
-              }
-              style={styles.cameraIconBtn}
-              hitSlop={8}
-              accessibilityLabel="Scan Prescription"
-            >
-              <SvgXml xml={CAMERA_SVG} width={22} height={22} />
-            </Pressable>
           </View>
 
           {/* 3. Filter Pills Row */}
@@ -450,7 +426,7 @@ export default function MedicinesScreen({ onBack }: { onBack?: () => void }) {
             columnWrapperStyle={styles.gridColumnWrapper}
             contentContainerStyle={[
               styles.gridContentContainer,
-              totalCartCount > 0 && { paddingBottom: 110 },
+              totalCartCount > 0 && { paddingBottom: 80 },
             ]}
             showsVerticalScrollIndicator={false}
             keyboardShouldPersistTaps="handled"
@@ -479,7 +455,7 @@ export default function MedicinesScreen({ onBack }: { onBack?: () => void }) {
 
           {/* 5. Sticky Floating Cart Bar (When Items Added) */}
           {totalCartCount > 0 && (
-            <View style={[styles.floatingCartBar, { bottom: Math.max(insets.bottom, 48) }]}>
+            <View style={[styles.floatingCartBar, { bottom: Math.max(insets.bottom, 12) }]}>
               <View style={styles.cartInfoSection}>
                 <Text style={styles.cartCountText}>
                   {totalCartCount} {totalCartCount === 1 ? 'item' : 'items'} in cart
@@ -495,19 +471,6 @@ export default function MedicinesScreen({ onBack }: { onBack?: () => void }) {
               </Pressable>
             </View>
           )}
-
-          {/* 6. Bottom Sticky Offer Banner */}
-          <View
-            style={[
-              styles.bottomOfferBanner,
-              { bottom: Math.max(insets.bottom, 6) },
-            ]}
-          >
-            <SvgXml xml={PERCENT_BADGE_SVG} width={18} height={18} />
-            <Text style={styles.bottomOfferText}>
-              Get upto 26% OFF on orders above Rs 1000+
-            </Text>
-          </View>
         </View>
       ) : (
         /* ========================================================
@@ -806,11 +769,6 @@ const styles = StyleSheet.create({
   clearSearchIcon: {
     padding: 4,
   },
-  cameraIconBtn: {
-    padding: 2,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
   filterPillsRow: {
     paddingBottom: 10,
   },
@@ -852,7 +810,7 @@ const styles = StyleSheet.create({
   // 2-Column Grid Layout
   gridContentContainer: {
     paddingHorizontal: 10,
-    paddingBottom: 60,
+    paddingBottom: 24,
   },
   gridColumnWrapper: {
     justifyContent: 'space-between',
@@ -989,32 +947,6 @@ const styles = StyleSheet.create({
     fontSize: 10.5,
     color: '#1d2129',
     marginHorizontal: 3,
-  },
-
-  // Bottom Sticky Offer Banner
-  bottomOfferBanner: {
-    position: 'absolute',
-    left: 12,
-    right: 12,
-    backgroundColor: '#e8faf0',
-    borderWidth: 1,
-    borderColor: '#a3e8c1',
-    borderRadius: 14,
-    paddingVertical: 9,
-    paddingHorizontal: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    shadowColor: 'rgba(0, 0, 0, 0.06)',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  bottomOfferText: {
-    fontFamily: 'Roboto_700Bold',
-    fontSize: 12,
-    color: '#065f46',
   },
 
   // Floating Cart Bar
