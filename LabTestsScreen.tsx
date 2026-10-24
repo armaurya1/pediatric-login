@@ -77,7 +77,7 @@ const PACKAGES: PackageItem[] = [
     price: 899,
     originalPrice: 1200,
     discount: '25% OFF',
-    image: require('./assets/images/lab/pkg-vitamin.png'),
+    image: require('./assets/images/lab/pkg-vitamin-hd.png'),
     testsCount: 5,
     testsIncluded: [
       'Vitamin D (25-OH Cholecalciferol)',
@@ -100,7 +100,7 @@ const PACKAGES: PackageItem[] = [
     price: 2599,
     originalPrice: 3400,
     discount: '24% OFF',
-    image: require('./assets/images/lab/pkg-young-indian.png'),
+    image: require('./assets/images/lab/pkg-young-indian-hd.png'),
     testsCount: 96,
     testsIncluded: [
       'Complete Blood Count (CBC - 24 parameters)',
@@ -126,7 +126,7 @@ const PACKAGES: PackageItem[] = [
     price: 3499,
     originalPrice: 4500,
     discount: '22% OFF',
-    image: require('./assets/images/lab/pkg-full-body.png'),
+    image: require('./assets/images/lab/pkg-full-body-hd.png'),
     testsCount: 106,
     testsIncluded: [
       'Full Blood Hemogram & Anemia Screen (28 parameters)',
@@ -152,7 +152,7 @@ const PACKAGES: PackageItem[] = [
     price: 4999,
     originalPrice: 6249,
     discount: '20% OFF',
-    image: require('./assets/images/lab/pkg-platinum.png'),
+    image: require('./assets/images/lab/pkg-platinum-hd.png'),
     testsCount: 112,
     testsIncluded: [
       'Complete Hemogram & Platelet Kinetics',
@@ -321,8 +321,8 @@ export default function LabTestsScreen({ onBack }: Props) {
         {/* 3. Hero Scooter Delivery Illustration */}
         <View style={styles.heroWrap}>
           <Image
-            source={require('./assets/images/lab/hero-delivery-lavender.png')}
-            style={[styles.heroImage, { width: windowWidth - 28, height: ((windowWidth - 28) * 310) / 418 }]}
+            source={require('./assets/images/lab/hero-delivery-hd.png')}
+            style={[styles.heroImage, { width: windowWidth - 28, height: Math.min(windowWidth - 28, 250) }]}
             resizeMode="contain"
           />
         </View>
@@ -331,7 +331,7 @@ export default function LabTestsScreen({ onBack }: Props) {
         <View style={styles.expertSection}>
           <View style={styles.expertHeaderRow}>
             <Image
-              source={require('./assets/images/lab/expert-avatar.png')}
+              source={require('./assets/images/lab/expert-avatar-hd.png')}
               style={styles.expertAvatar}
               resizeMode="cover"
             />
@@ -460,7 +460,7 @@ export default function LabTestsScreen({ onBack }: Props) {
         <View style={styles.bottomBarLeft}>
           <View style={styles.bottomAvatarWrap}>
             <Image
-              source={require('./assets/images/lab/bottom-avatar.png')}
+              source={require('./assets/images/lab/expert-avatar-hd.png')}
               style={styles.bottomAvatar}
               resizeMode="cover"
             />
