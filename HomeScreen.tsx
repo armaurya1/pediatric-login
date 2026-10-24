@@ -20,6 +20,7 @@ import {
   Roboto_700Bold,
   useFonts,
 } from '@expo-google-fonts/roboto';
+import ProfileScreen from './ProfileScreen';
 
 // SVG icons from Figma (file q4OVzpZDgUgZoTikqnYWoh, node 34:537)
 const ICONS = {
@@ -59,6 +60,11 @@ const ICONS = {
 <circle cx="11.5" cy="11.5" r="10" stroke="#160B37" stroke-width="1.7"/>
 <circle cx="11.5" cy="9" r="3.1" stroke="#160B37" stroke-width="1.6"/>
 <path d="M5.8 18.2C6.9 15.9 9 14.8 11.5 14.8C14 14.8 16.1 15.9 17.2 18.2" stroke="#160B37" stroke-width="1.6" stroke-linecap="round"/>
+</svg>`,
+  accountWhite: `<svg width="23" height="23" viewBox="0 0 23 23" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="11.5" cy="11.5" r="10" stroke="white" stroke-width="1.7"/>
+<circle cx="11.5" cy="9" r="3.1" stroke="white" stroke-width="1.6"/>
+<path d="M5.8 18.2C6.9 15.9 9 14.8 11.5 14.8C14 14.8 16.1 15.9 17.2 18.2" stroke="white" stroke-width="1.6" stroke-linecap="round"/>
 </svg>`,
 };
 
@@ -126,17 +132,25 @@ export default function HomeScreen({
       case 'video':
         return ICONS.videoConsult;
       case 'account':
-        return ICONS.account;
+        return selected ? ICONS.accountWhite : ICONS.account;
     }
   };
 
   return (
-    <View style={styles.root}>
+    <View style={[styles.root, activeTab === 'account' && { backgroundColor: '#edf0f9' }]}>
       <StatusBar style="dark" />
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: 118 }}
-        showsVerticalScrollIndicator={false}
-      >
+      {activeTab === 'account' ? (
+        <ProfileScreen
+          onOnlineConsult={onOnlineConsult}
+          onMedicines={onMedicines || (() => {})}
+          onLabTests={onLabTests || (() => {})}
+          onDoctorProfile={onDoctorProfile}
+        />
+      ) : (
+        <ScrollView
+          contentContainerStyle={{ paddingBottom: 118 }}
+          showsVerticalScrollIndicator={false}
+        >
         {/* Location and search (Figma 34:538) */}
         <View style={{ paddingTop: insets.top + 18 }}>
           <View style={styles.locationRow}>
@@ -404,6 +418,7 @@ export default function HomeScreen({
           </View>
         </View>
       </ScrollView>
+      )}
 
       {/* Primary navigation (Figma 34:602) */}
       <View style={[styles.navWrap, { bottom: 0 }]}>
